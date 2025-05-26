@@ -169,7 +169,7 @@ export default function SubjectsPage() {
         </title>
         <meta
           name="description"
-          content="Browse question papers by subject for your selected university."
+          content="Browse question papers by subject for your selected university. Earn the revenue by uploading your own past exam papers."
         />
       </Head>
       <div className="min-h-screen bg-[#f7f9fb]">

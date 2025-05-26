@@ -157,7 +157,7 @@ export default function AddUniversityPage() {
         <title>Become a Contributor - Add Your University</title>
         <meta
           name="description"
-          content="Become a contributor by adding your university and uploading papers to earn revenue."
+          content="Become a contributor by adding your university and uploading past exam papers to earn revenue."
         />
       </Head>
       <div className="min-h-screen flex flex-col items-center bg-[#f7f9fb] px-2 py-10">

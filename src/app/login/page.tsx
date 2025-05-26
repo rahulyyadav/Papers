@@ -43,7 +43,7 @@ export default function LoginPage() {
         <title>Login to Papers Platform</title>
         <meta
           name="description"
-          content="Log in to your Papers Platform account to share papers, earn revenue, and access resources."
+          content="Log in to your Papers Platform account to share past exam question papers, earn revenue, and access resources."
         />
       </Head>
       <div className="min-h-screen flex flex-col items-center justify-center bg-white px-4">

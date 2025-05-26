@@ -7,7 +7,7 @@ export default function RevenueModelPage() {
         <title>Revenue Model - Papers Platform</title>
         <meta
           name="description"
-          content="Learn about the revenue sharing model for contributors on Papers Platform."
+          content="Learn about the revenue sharing model for contributors on past exam Papers Platform."
         />
       </Head>
       <div className="min-h-screen bg-[#f7f9fb] text-black py-8 px-4">

@@ -9,7 +9,7 @@ export default function Home() {
         <title>Papers Platform - Share, Earn, and Learn</title>
         <meta
           name="description"
-          content="Share your past university papers, earn revenue from views, and access academic resources."
+          content="Share your past university exam question papers, earn revenue from views, and access academic resources."
         />
       </Head>
       <div className="min-h-screen flex flex-col bg-white text-black relative">
