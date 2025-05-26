@@ -11,6 +11,11 @@ export default function Home() {
           name="description"
           content="Share your past university exam question papers, earn revenue from views, and access academic resources."
         />
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2349705329371450"
+          crossOrigin="anonymous"
+        ></script>
       </Head>
       <div className="min-h-screen flex flex-col bg-white text-black relative">
         {/* Header */}

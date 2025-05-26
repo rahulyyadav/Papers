@@ -171,6 +171,11 @@ export default function SubjectsPage() {
           name="description"
           content="Browse question papers by subject for your selected university. Earn the revenue by uploading your own past exam papers."
         />
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2349705329371450"
+          crossOrigin="anonymous"
+        ></script>
       </Head>
       <div className="min-h-screen bg-[#f7f9fb]">
         {/* Navbar */}

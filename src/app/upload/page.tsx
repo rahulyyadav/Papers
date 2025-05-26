@@ -348,6 +348,11 @@ export default function UploadPage() {
           name="description"
           content="Upload your university question papers to Papers Platform and start earning revenue."
         />
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2349705329371450"
+          crossOrigin="anonymous"
+        ></script>
       </Head>
       <div className="min-h-screen bg-[#f7f9fb] flex flex-col items-center py-8 px-2">
         <h1 className="text-3xl font-bold text-center mb-8">

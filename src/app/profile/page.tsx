@@ -134,6 +134,11 @@ export default function ProfilePage() {
           name="description"
           content="View and update your personal and contributor information on Papers Platform."
         />
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2349705329371450"
+          crossOrigin="anonymous"
+        ></script>
       </Head>
       <div className="min-h-screen bg-[#f7f9fb] px-4 py-8">
         <div className="max-w-4xl mx-auto">

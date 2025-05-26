@@ -159,6 +159,11 @@ export default function AddUniversityPage() {
           name="description"
           content="Become a contributor by adding your university and uploading past exam papers to earn revenue."
         />
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2349705329371450"
+          crossOrigin="anonymous"
+        ></script>
       </Head>
       <div className="min-h-screen flex flex-col items-center bg-[#f7f9fb] px-2 py-10">
         <div className="w-full max-w-lg bg-white rounded-2xl shadow p-8 flex flex-col gap-8">

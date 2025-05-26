@@ -9,6 +9,11 @@ export default function RevenueModelPage() {
           name="description"
           content="Learn about the revenue sharing model for contributors on past exam Papers Platform."
         />
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2349705329371450"
+          crossOrigin="anonymous"
+        ></script>
       </Head>
       <div className="min-h-screen bg-[#f7f9fb] text-black py-8 px-4">
         <div className="max-w-3xl mx-auto">

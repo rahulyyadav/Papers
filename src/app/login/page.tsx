@@ -45,6 +45,11 @@ export default function LoginPage() {
           name="description"
           content="Log in to your Papers Platform account to share past exam question papers, earn revenue, and access resources."
         />
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2349705329371450"
+          crossOrigin="anonymous"
+        ></script>
       </Head>
       <div className="min-h-screen flex flex-col items-center justify-center bg-white px-4">
         <div className="w-full max-w-md bg-gray-50 rounded-2xl shadow-xl p-8 flex flex-col items-center">

@@ -242,6 +242,11 @@ export default function HomePage() {
           name="description"
           content="Find and access past question papers for your university. Search by course, exam, or year."
         />
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2349705329371450"
+          crossOrigin="anonymous"
+        ></script>
       </Head>
       <div className="min-h-screen bg-[#f7f9fb]">
         {/* Navbar */}
