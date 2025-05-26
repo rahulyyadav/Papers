@@ -3,9 +3,10 @@ import { useState, useRef, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { v4 as uuidv4 } from "uuid";
 import { PDFDocument } from "pdf-lib";
+import Head from "next/head";
 
 export default function UploadPage() {
-  const [universities, setUniversities] = useState<any[]>([]);  
+  const [universities, setUniversities] = useState<any[]>([]);
   const [university, setUniversity] = useState("");
   const [universityId, setUniversityId] = useState<string | null>(null);
   const [examNames, setExamNames] = useState<string[]>([]);
@@ -92,7 +93,6 @@ export default function UploadPage() {
     file.type === "application/pdf";
 
   async function compressPdfToUnderHalfMB(inputPdf: File): Promise<Blob> {
-     
     console.log("Original PDF size:", (inputPdf.size / 1024).toFixed(2), "KB");
     const buffer = await inputPdf.arrayBuffer();
 
@@ -321,7 +321,7 @@ export default function UploadPage() {
     uploading: "Uploading PDF",
   };
 
-  type UploadStepKey = keyof typeof stepNames;  
+  type UploadStepKey = keyof typeof stepNames;
 
   const getStepStatus = (step: UploadStepKey) => {
     const stepOrder: UploadStepKey[] = [
@@ -341,420 +341,433 @@ export default function UploadPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f7f9fb] flex flex-col items-center py-8 px-2">
-      <h1 className="text-3xl font-bold text-center mb-8">
-        Upload Past Papers
-      </h1>
-      <div className="w-full max-w-2xl mx-auto">
-        {/* Hero Section (Updated) */}
-        <div
-          className="bg-white rounded-2xl shadow mb-8 p-8 flex flex-col gap-2 items-start justify-center relative"
-          style={{
-            minHeight: 180,
-          }}
-        >
-          {/* Removed Background Image and Overlay */}
-          <div className="max-w-md">
-            <div className="text-xl font-bold mb-1">
-              Upload your past papers and earn money
-            </div>
-            <div className="text-base text-gray-700">
-              Upload your past papers to help other students and earn money for
-              your contributions.
-            </div>
-          </div>
-        </div>
-        {/* Form (Improved UI) */}
-        <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
-          <div>
-            <label
-              htmlFor="university"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              University<span className="text-red-500">*</span>
-            </label>
-            <select
-              id="university"
-              aria-label="Select University"
-              className="rounded-lg border border-gray-300 px-4 py-3 bg-white text-base focus:border-black focus:ring-1 focus:ring-black outline-none w-full"
-              value={university}
-              onChange={(e) => setUniversity(e.target.value)}
-              required
-              disabled={loading}
-            >
-              <option value="">Select University</option>
-              {universities.map((uni) => (
-                <option key={uni.id} value={uni.name}>
-                  {uni.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label
-              htmlFor="exam"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Exam<span className="text-red-500">*</span>
-            </label>
-            <select
-              id="exam"
-              aria-label="Select Exam"
-              className="rounded-lg border border-gray-300 px-4 py-3 bg-white text-base focus:border-black focus:ring-1 focus:ring-black outline-none w-full"
-              value={exam}
-              onChange={(e) => setExam(e.target.value)}
-              required
-              disabled={loading}
-            >
-              <option value="">Select Exam</option>
-              {examNames.map((exam) => (
-                <option key={exam} value={exam}>
-                  {exam}
-                </option>
-              ))}
-              <option value="Other">Other</option>
-            </select>
-          </div>
-
-          {exam === "Other" && (
-            <div>
-              <label
-                htmlFor="custom-exam"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Custom Exam Name<span className="text-red-500">*</span>
-              </label>
-              <input
-                id="custom-exam"
-                type="text"
-                placeholder="Enter exam name"
-                className="rounded-lg border border-gray-300 px-4 py-3 bg-white text-base focus:border-black focus:ring-1 focus:ring-black outline-none w-full"
-                value={customExam}
-                onChange={(e) => setCustomExam(e.target.value)}
-                required
-                disabled={loading}
-              />
-            </div>
-          )}
-
-          <div>
-            <label
-              htmlFor="exam-year"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Exam Year<span className="text-red-500">*</span>
-            </label>
-            <input
-              id="exam-year"
-              type="text"
-              placeholder="e.g. 2023"
-              className="rounded-lg border border-gray-300 px-4 py-3 bg-white text-base focus:border-black focus:ring-1 focus:ring-black outline-none w-full"
-              value={examYear}
-              onChange={(e) => setExamYear(e.target.value)}
-              required
-              disabled={loading}
-              aria-label="Exam Year"
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="course-code"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Course Code<span className="text-red-500">*</span>
-            </label>
-            <input
-              id="course-code"
-              type="text"
-              placeholder="e.g. CS101"
-              className="rounded-lg border border-gray-300 px-4 py-3 bg-white text-base focus:border-black focus:ring-1 focus:ring-black outline-none w-full"
-              value={courseCode}
-              onChange={(e) => setCourseCode(e.target.value)}
-              required
-              disabled={loading}
-              aria-label="Course Code"
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="course-name"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Course Name<span className="text-red-500">*</span>
-            </label>
-            <input
-              id="course-name"
-              type="text"
-              placeholder="e.g. Introduction to Computer Science"
-              className="rounded-lg border border-gray-300 px-4 py-3 bg-white text-base focus:border-black focus:ring-1 focus:ring-black outline-none w-full"
-              value={courseName}
-              onChange={(e) => setCourseName(e.target.value)}
-              required
-              disabled={loading}
-              aria-label="Course Name"
-            />
-          </div>
-
-          {/* File Upload */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Upload PDF<span className="text-red-500">*</span>
-            </label>
-            <div
-              className={`rounded-xl border-2 border-dashed ${
-                dragActive
-                  ? "border-blue-400 bg-blue-50"
-                  : "border-gray-300 bg-white"
-              } flex flex-col items-center justify-center py-10 px-4 text-center transition-colors cursor-pointer w-full`}
-              onDrop={handleDrop}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileChange}
-                accept="application/pdf"
-                required
-                disabled={loading}
-                className="hidden"
-                aria-label={
-                  file
-                    ? `Selected file: ${file.name}`
-                    : "Drag and drop your PDF here, or click to select"
-                }
-              />
-              {file ? (
-                <div className="text-gray-700 font-medium">
-                  Selected file: {file.name}
-                </div>
-              ) : (
-                <div className="text-gray-500">
-                  Drag and drop your PDF here, or click to select
-                </div>
-              )}
-            </div>
-          </div>
-
-          {error && (
-            <div className="text-red-500 text-sm mt-2 text-center">{error}</div>
-          )}
-
-          {/* Upload Progress Indicator */}
-          {uploadStep !== "idle" && uploadStep !== "success" && (
-            <div className="mt-6 w-full">
-              <h3 className="font-semibold text-lg text-center mb-4">
-                Uploading...
-              </h3>
-              <div className="flex items-start justify-between w-full relative">
-                {/* Connecting Line */}
-                <div className="absolute top-4 left-0 right-0 h-0.5 bg-gray-300 z-0" />
-                <div
-                  className={`absolute top-4 left-0 h-0.5 bg-green-500 z-10 transition-all duration-500 ease-in-out`}
-                  style={{
-                    width: `${
-                      uploadStep === "checking_info"
-                        ? 0 // Line starts after first step completes visually
-                        : uploadStep === "checking_quality"
-                        ? 33
-                        : uploadStep === "compressing"
-                        ? 66
-                        : uploadStep === "uploading"
-                        ? 99
-                        : 0 // Extend almost fully for uploading
-                    }%`,
-                  }}
-                />
-
-                {Object.entries(stepNames).map(([key, name]) => (
-                  <div
-                    key={key}
-                    className="flex flex-col items-center z-20 w-1/4"
-                  >
-                    <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold transition-colors duration-500
-                        ${
-                          getStepStatus(key as UploadStepKey) === "completed"
-                            ? "bg-green-500"
-                            : getStepStatus(key as UploadStepKey) === "current"
-                            ? "bg-blue-500 animate-pulse"
-                            : getStepStatus(key as UploadStepKey) === "failed"
-                            ? "bg-red-500"
-                            : "bg-gray-300"
-                        }
-                      `}
-                    >
-                      {getStepStatus(key as UploadStepKey) === "completed" && (
-                        <svg
-                          className="w-5 h-5 text-white"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                      )}
-                      {getStepStatus(key as UploadStepKey) === "current" && (
-                        <svg
-                          className="w-5 h-5 text-white animate-spin"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          ></circle>
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l2-2.647z"
-                          ></path>
-                        </svg>
-                      )}
-                      {getStepStatus(key as UploadStepKey) === "failed" && (
-                        <svg
-                          className="w-5 h-5 text-white"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M6 18L18 6M6 6l12 12"
-                          ></path>
-                        </svg>
-                      )}
-                    </div>
-                    <div
-                      className={`text-xs mt-1 text-center ${
-                        getStepStatus(key as UploadStepKey) === "current"
-                          ? "font-semibold text-blue-600"
-                          : getStepStatus(key as UploadStepKey) === "failed"
-                          ? "text-red-600"
-                          : "text-gray-600"
-                      }`}
-                    >
-                      {name}
-                    </div>
-                  </div>
-                ))}
+    <>
+      <Head>
+        <title>Upload Papers - Contribute and Earn</title>
+        <meta
+          name="description"
+          content="Upload your university question papers to Papers Platform and start earning revenue."
+        />
+      </Head>
+      <div className="min-h-screen bg-[#f7f9fb] flex flex-col items-center py-8 px-2">
+        <h1 className="text-3xl font-bold text-center mb-8">
+          Upload Past Papers
+        </h1>
+        <div className="w-full max-w-2xl mx-auto">
+          {/* Hero Section (Updated) */}
+          <div
+            className="bg-white rounded-2xl shadow mb-8 p-8 flex flex-col gap-2 items-start justify-center relative"
+            style={{
+              minHeight: 180,
+            }}
+          >
+            {/* Removed Background Image and Overlay */}
+            <div className="max-w-md">
+              <div className="text-xl font-bold mb-1">
+                Upload your past papers and earn money
+              </div>
+              <div className="text-base text-gray-700">
+                Upload your past papers to help other students and earn money
+                for your contributions.
               </div>
             </div>
-          )}
-
-          {success && (
-            <div className="flex flex-col items-center gap-2 text-green-700 text-base mt-4 animate-fade-in">
-              <svg
-                className="w-10 h-10 text-green-500 animate-bounce"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
+          </div>
+          {/* Form (Improved UI) */}
+          <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
+            <div>
+              <label
+                htmlFor="university"
+                className="block text-sm font-medium text-gray-700 mb-1"
               >
-                <circle
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  fill="#d1fae5"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M8 12l2.5 2.5L16 9"
-                />
-              </svg>
-              <span className="font-semibold text-center">
-                Paper uploaded successfully!
-              </span>
+                University<span className="text-red-500">*</span>
+              </label>
+              <select
+                id="university"
+                aria-label="Select University"
+                className="rounded-lg border border-gray-300 px-4 py-3 bg-white text-base focus:border-black focus:ring-1 focus:ring-black outline-none w-full"
+                value={university}
+                onChange={(e) => setUniversity(e.target.value)}
+                required
+                disabled={loading}
+              >
+                <option value="">Select University</option>
+                {universities.map((uni) => (
+                  <option key={uni.id} value={uni.name}>
+                    {uni.name}
+                  </option>
+                ))}
+              </select>
             </div>
-          )}
 
-          {/* Submit Button */}
-          <button
-            type="submit"
-            className="mt-6 bg-black text-white font-semibold rounded-xl py-3 transition disabled:opacity-60 w-full"
-            disabled={loading || success || !isFormValid}
-          >
-            {loading
-              ? uploadStep === "checking_info"
-                ? "Checking Info..."
-                : uploadStep === "checking_quality"
-                ? "Checking Quality..."
-                : uploadStep === "compressing"
-                ? "Compressing..."
-                : uploadStep === "uploading"
-                ? "Uploading..."
-                : "Processing..."
-              : "Upload Paper"}
-          </button>
-        </form>
+            <div>
+              <label
+                htmlFor="exam"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Exam<span className="text-red-500">*</span>
+              </label>
+              <select
+                id="exam"
+                aria-label="Select Exam"
+                className="rounded-lg border border-gray-300 px-4 py-3 bg-white text-base focus:border-black focus:ring-1 focus:ring-black outline-none w-full"
+                value={exam}
+                onChange={(e) => setExam(e.target.value)}
+                required
+                disabled={loading}
+              >
+                <option value="">Select Exam</option>
+                {examNames.map((exam) => (
+                  <option key={exam} value={exam}>
+                    {exam}
+                  </option>
+                ))}
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            {exam === "Other" && (
+              <div>
+                <label
+                  htmlFor="custom-exam"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Custom Exam Name<span className="text-red-500">*</span>
+                </label>
+                <input
+                  id="custom-exam"
+                  type="text"
+                  placeholder="Enter exam name"
+                  className="rounded-lg border border-gray-300 px-4 py-3 bg-white text-base focus:border-black focus:ring-1 focus:ring-black outline-none w-full"
+                  value={customExam}
+                  onChange={(e) => setCustomExam(e.target.value)}
+                  required
+                  disabled={loading}
+                />
+              </div>
+            )}
+
+            <div>
+              <label
+                htmlFor="exam-year"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Exam Year<span className="text-red-500">*</span>
+              </label>
+              <input
+                id="exam-year"
+                type="text"
+                placeholder="e.g. 2023"
+                className="rounded-lg border border-gray-300 px-4 py-3 bg-white text-base focus:border-black focus:ring-1 focus:ring-black outline-none w-full"
+                value={examYear}
+                onChange={(e) => setExamYear(e.target.value)}
+                required
+                disabled={loading}
+                aria-label="Exam Year"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="course-code"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Course Code<span className="text-red-500">*</span>
+              </label>
+              <input
+                id="course-code"
+                type="text"
+                placeholder="e.g. CS101"
+                className="rounded-lg border border-gray-300 px-4 py-3 bg-white text-base focus:border-black focus:ring-1 focus:ring-black outline-none w-full"
+                value={courseCode}
+                onChange={(e) => setCourseCode(e.target.value)}
+                required
+                disabled={loading}
+                aria-label="Course Code"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="course-name"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Course Name<span className="text-red-500">*</span>
+              </label>
+              <input
+                id="course-name"
+                type="text"
+                placeholder="e.g. Introduction to Computer Science"
+                className="rounded-lg border border-gray-300 px-4 py-3 bg-white text-base focus:border-black focus:ring-1 focus:ring-black outline-none w-full"
+                value={courseName}
+                onChange={(e) => setCourseName(e.target.value)}
+                required
+                disabled={loading}
+                aria-label="Course Name"
+              />
+            </div>
+
+            {/* File Upload */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Upload PDF<span className="text-red-500">*</span>
+              </label>
+              <div
+                className={`rounded-xl border-2 border-dashed ${
+                  dragActive
+                    ? "border-blue-400 bg-blue-50"
+                    : "border-gray-300 bg-white"
+                } flex flex-col items-center justify-center py-10 px-4 text-center transition-colors cursor-pointer w-full`}
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  accept="application/pdf"
+                  required
+                  disabled={loading}
+                  className="hidden"
+                  aria-label={
+                    file
+                      ? `Selected file: ${file.name}`
+                      : "Drag and drop your PDF here, or click to select"
+                  }
+                />
+                {file ? (
+                  <div className="text-gray-700 font-medium">
+                    Selected file: {file.name}
+                  </div>
+                ) : (
+                  <div className="text-gray-500">
+                    Drag and drop your PDF here, or click to select
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {error && (
+              <div className="text-red-500 text-sm mt-2 text-center">
+                {error}
+              </div>
+            )}
+
+            {/* Upload Progress Indicator */}
+            {uploadStep !== "idle" && uploadStep !== "success" && (
+              <div className="mt-6 w-full">
+                <h3 className="font-semibold text-lg text-center mb-4">
+                  Uploading...
+                </h3>
+                <div className="flex items-start justify-between w-full relative">
+                  {/* Connecting Line */}
+                  <div className="absolute top-4 left-0 right-0 h-0.5 bg-gray-300 z-0" />
+                  <div
+                    className={`absolute top-4 left-0 h-0.5 bg-green-500 z-10 transition-all duration-500 ease-in-out`}
+                    style={{
+                      width: `${
+                        uploadStep === "checking_info"
+                          ? 0 // Line starts after first step completes visually
+                          : uploadStep === "checking_quality"
+                          ? 33
+                          : uploadStep === "compressing"
+                          ? 66
+                          : uploadStep === "uploading"
+                          ? 99
+                          : 0 // Extend almost fully for uploading
+                      }%`,
+                    }}
+                  />
+
+                  {Object.entries(stepNames).map(([key, name]) => (
+                    <div
+                      key={key}
+                      className="flex flex-col items-center z-20 w-1/4"
+                    >
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold transition-colors duration-500
+                          ${
+                            getStepStatus(key as UploadStepKey) === "completed"
+                              ? "bg-green-500"
+                              : getStepStatus(key as UploadStepKey) ===
+                                "current"
+                              ? "bg-blue-500 animate-pulse"
+                              : getStepStatus(key as UploadStepKey) === "failed"
+                              ? "bg-red-500"
+                              : "bg-gray-300"
+                          }
+                        `}
+                      >
+                        {getStepStatus(key as UploadStepKey) ===
+                          "completed" && (
+                          <svg
+                            className="w-5 h-5 text-white"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={2}
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M5 13l4 4L19 7"
+                            />
+                          </svg>
+                        )}
+                        {getStepStatus(key as UploadStepKey) === "current" && (
+                          <svg
+                            className="w-5 h-5 text-white animate-spin"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l2-2.647z"
+                            ></path>
+                          </svg>
+                        )}
+                        {getStepStatus(key as UploadStepKey) === "failed" && (
+                          <svg
+                            className="w-5 h-5 text-white"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={2}
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M6 18L18 6M6 6l12 12"
+                            ></path>
+                          </svg>
+                        )}
+                      </div>
+                      <div
+                        className={`text-xs mt-1 text-center ${
+                          getStepStatus(key as UploadStepKey) === "current"
+                            ? "font-semibold text-blue-600"
+                            : getStepStatus(key as UploadStepKey) === "failed"
+                            ? "text-red-600"
+                            : "text-gray-600"
+                        }`}
+                      >
+                        {name}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {success && (
+              <div className="flex flex-col items-center gap-2 text-green-700 text-base mt-4 animate-fade-in">
+                <svg
+                  className="w-10 h-10 text-green-500 animate-bounce"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    fill="#d1fae5"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M8 12l2.5 2.5L16 9"
+                  />
+                </svg>
+                <span className="font-semibold text-center">
+                  Paper uploaded successfully!
+                </span>
+              </div>
+            )}
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              className="mt-6 bg-black text-white font-semibold rounded-xl py-3 transition disabled:opacity-60 w-full"
+              disabled={loading || success || !isFormValid}
+            >
+              {loading
+                ? uploadStep === "checking_info"
+                  ? "Checking Info..."
+                  : uploadStep === "checking_quality"
+                  ? "Checking Quality..."
+                  : uploadStep === "compressing"
+                  ? "Compressing..."
+                  : uploadStep === "uploading"
+                  ? "Uploading..."
+                  : "Processing..."
+                : "Upload Paper"}
+            </button>
+          </form>
+        </div>
+        {/* Animation Style */}
+        <style jsx global>{`
+          @keyframes fade-in {
+            from {
+              opacity: 0;
+              transform: translateY(10px);
+            }
+            to {
+              opacity: 1;
+              transform: none;
+            }
+          }
+          .animate-fade-in {
+            animation: fade-in 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+          }
+          @keyframes pulse {
+            0%,
+            100% {
+              opacity: 1;
+            }
+            50% {
+              opacity: 0.5;
+            }
+          }
+          .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+          }
+          @keyframes bounce {
+            0%,
+            20%,
+            53%,
+            80%,
+            100% {
+              transform: translateZ(0);
+            }
+            40%,
+            43% {
+              transform: translateY(-10px);
+            }
+            78% {
+              transform: translateY(-5px);
+            }
+          }
+          .animate-bounce {
+            animation: bounce 1s infinite;
+          }
+        `}</style>
       </div>
-      {/* Animation Style */}
-      <style jsx global>{`
-        @keyframes fade-in {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: none;
-          }
-        }
-        .animate-fade-in {
-          animation: fade-in 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
-        }
-        @keyframes pulse {
-          0%,
-          100% {
-            opacity: 1;
-          }
-          50% {
-            opacity: 0.5;
-          }
-        }
-        .animate-pulse {
-          animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-        @keyframes bounce {
-          0%,
-          20%,
-          53%,
-          80%,
-          100% {
-            transform: translateZ(0);
-          }
-          40%,
-          43% {
-            transform: translateY(-10px);
-          }
-          78% {
-            transform: translateY(-5px);
-          }
-        }
-        .animate-bounce {
-          animation: bounce 1s infinite;
-        }
-      `}</style>
-    </div>
+    </>
   );
 }

@@ -2,6 +2,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import Head from "next/head";
 
 export default function HomePage() {
   const router = useRouter();
@@ -230,290 +231,304 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f7f9fb]">
-      {/* Navbar */}
-      <nav className="w-full flex items-center justify-between px-8 py-4 bg-white border-b border-gray-200">
-        <div className="flex items-center gap-8">
-          <span className="font-bold text-2xl tracking-tight flex items-center gap-2">
-            Papers
-          </span>
-          <div className="hidden md:flex gap-6 text-sm font-medium text-gray-700">
-            <a
-              href="/home"
-              onClick={(e) => {
-                e.preventDefault();
-                router.refresh();
-              }}
-              className="hover:text-black font-semibold text-black"
-            >
-              Dashboard
-            </a>
-            <a href="/subjects" className="hover:text-black">
-              Subjects
-            </a>
-            <a href="/upload" className="hover:text-black">
-              Upload Paper
-            </a>
-          </div>
-        </div>
-        <div className="flex items-center gap-4">
-          {/* University Dropdown */}
-          <select
-            aria-label="Select university"
-            className="rounded-full bg-[#f2f4f7] px-4 py-2 text-sm border border-gray-200 focus:border-gray-400 outline-none min-w-[180px]"
-            value={selectedUniversity}
-            onChange={(e) => setSelectedUniversity(e.target.value)}
-          >
-            {universities.map((uni) => (
-              <option key={uni.id} value={uni.name}>
-                {uni.name}
-              </option>
-            ))}
-          </select>
-          {/* Profile Initials Dropdown */}
-          <div className="relative" ref={dropdownRef}>
-            <button
-              onClick={() => setDropdownOpen((v) => !v)}
-              className="w-9 h-9 rounded-full bg-[#d1e0e9] flex items-center justify-center font-bold text-lg text-[#2a3a4a] border border-gray-200 hover:shadow"
-              title="Profile"
-            >
-              {getInitials() || "--"}
-            </button>
-            {dropdownOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 z-50">
-                <button
-                  className="w-full text-left px-4 py-3 hover:bg-gray-100 rounded-t-lg"
-                  onClick={() => {
-                    setDropdownOpen(false);
-                    router.push("/profile");
-                  }}
-                >
-                  Profile Information
-                </button>
-                <button
-                  className="w-full text-left px-4 py-3 hover:bg-gray-100 rounded-b-lg text-red-600"
-                  onClick={handleLogout}
-                >
-                  Logout
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      </nav>
-
-      {/* Main Content */}
-      <div className="flex flex-col lg:flex-row gap-8 px-8 py-8 max-w-7xl mx-auto">
-        {/* Left: Recent Papers */}
-        <div className="flex-1 min-w-0">
-          <h2 className="text-2xl font-bold mb-6">
-            {selectedUniversity} Papers
-          </h2>
-          <div className="mb-8">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search by course name, code, exam name, or year"
-                className="w-full rounded-xl bg-[#e9eef3] px-4 py-3 pl-10 text-base border border-gray-200 focus:border-gray-400 outline-none"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <span className="absolute left-3 top-3 text-gray-400">
-                <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
-                  <path
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1 0 6.5 6.5a7.5 7.5 0 0 0 10.6 10.6Z"
-                  />
-                </svg>
-              </span>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {currentPapers.length === 0 && (
-              <div className="col-span-full text-gray-500 text-center py-8">
-                {searchTerm
-                  ? "No papers found matching your search."
-                  : "No papers found for this university."}
-              </div>
-            )}
-            {currentPapers.map((paper) => (
-              <div
-                key={paper.id}
-                className="bg-white rounded-2xl overflow-hidden shadow-sm flex flex-col border border-gray-200 hover:border-gray-400 transition"
-              >
-                <div className="aspect-[1/1] bg-[#f2f4f7] flex items-center justify-center p-4">
-                  <a
-                    href={paper.pdf_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full h-full flex items-center justify-center hover:bg-[#e9eef3] transition-colors rounded-xl"
-                  >
-                    <div className="flex flex-col items-center gap-2">
-                      <svg
-                        width="48"
-                        height="48"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          clipRule="evenodd"
-                          d="M8.707 4.293a1 1 0 0 1 0 1.414L5.414 9H17a1 1 0 1 1 0 2H5.414l3.293 3.293a1 1 0 0 1-1.414 1.414l-5-5a1 1 0 0 1 0-1.414l5-5a1 1 0 0 1 1.414 0Z"
-                          fill="#6B7280"
-                        />
-                      </svg>
-                      <span className="text-sm text-gray-600">View PDF</span>
-                    </div>
-                  </a>
-                </div>
-                <div className="p-4 flex flex-col gap-2">
-                  <div className="font-semibold text-base">
-                    {paper.course_name}
-                  </div>
-                  <div className="flex flex-wrap gap-2 text-xs">
-                    <span className="bg-[#d1e0e9] text-[#2a3a4a] rounded-full px-3 py-1">
-                      {paper.course_code}
-                    </span>
-                    <span className="bg-[#c6d9b7] text-[#3a4a2a] rounded-full px-3 py-1">
-                      {paper.exam_name}
-                    </span>
-                    <span className="bg-[#e9c6b7] text-[#4a3a2a] rounded-full px-3 py-1">
-                      {paper.exam_year}
-                    </span>
-                  </div>
-                  <div className="text-gray-400 text-xs">
-                    Uploaded {new Date(paper.uploaded_at).toLocaleDateString()}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-          {/* Pagination */}
-          {filteredPapers.length > papersPerPage && (
-            <div className="flex justify-center gap-4 mt-8">
-              <button
-                onClick={handlePrevPage}
-                disabled={currentPage === 1}
-                className="bg-black text-white font-semibold rounded-xl py-2 px-6 transition disabled:opacity-60"
-              >
-                Previous Page
-              </button>
-              <button
-                onClick={handleNextPage}
-                disabled={currentPage === totalPages}
-                className="bg-black text-white font-semibold rounded-xl py-2 px-6 transition disabled:opacity-60"
-              >
-                Next Page
-              </button>
-            </div>
-          )}
-        </div>
-        {/* Right: Ask AI */}
-        <aside className="w-full lg:w-[320px] flex-shrink-0">
-          <div className="bg-white rounded-2xl shadow p-6 mb-6">
-            <h3 className="font-semibold text-lg mb-4">Ask AI</h3>
-            <div className="flex flex-col gap-3 text-sm text-gray-700 mb-4">
-              <div className="font-medium">Suggested Prompts:</div>
-              {suggestedPrompts.map((prompt, index) => (
-                <button
-                  key={index}
-                  className="text-left bg-[#e9eef3] hover:bg-[#dbe3ea] transition rounded-lg px-3 py-2 cursor-pointer"
-                  onClick={() => handleSuggestedPromptClick(prompt)}
-                >
-                  {prompt}
-                </button>
-              ))}
-            </div>
-            <button
-              className="w-full bg-[#e9eef3] text-black font-semibold rounded-xl py-2 mt-2 hover:bg-[#dbe3ea] transition"
-              onClick={() => setShowChatModal(true)}
-            >
-              Ask AI
-            </button>
-          </div>
-        </aside>
-      </div>
-      {/* Chat Modal */}
-      {showChatModal && (
-        <>
-          <div
-            className="fixed inset-0 bg-black/40 z-40"
-            onClick={() => setShowChatModal(false)}
-          />
-          <div className="fixed inset-0 z-50 flex items-center justify-center">
-            <div className="bg-white rounded-2xl border border-gray-200 p-6 w-full max-w-md shadow-xl relative flex flex-col h-[80vh]">
-              <button
-                className="absolute top-4 right-4 text-2xl text-gray-400 hover:text-black"
-                onClick={() => setShowChatModal(false)}
-                aria-label="Close"
-              >
-                &times;
-              </button>
-              <h4 className="text-lg font-semibold mb-2">Ask AI</h4>
-              <div className="flex-1 overflow-y-auto mb-4 border rounded-lg p-2 bg-[#f7f9fb]">
-                {chatMessages.length === 0 && (
-                  <div className="text-gray-400 text-center py-8">
-                    Ask anything about papers, exams, or universities!
-                  </div>
-                )}
-                {chatMessages.map((msg, i) => (
-                  <div
-                    key={i}
-                    className={`mb-2 flex ${
-                      msg.role === "user" ? "justify-end" : "justify-start"
-                    }`}
-                  >
-                    <div
-                      className={`px-4 py-2 rounded-xl max-w-[80%] text-sm ${
-                        msg.role === "user"
-                          ? "bg-black text-white"
-                          : "bg-[#e9eef3] text-black"
-                      }`}
-                    >
-                      {msg.text}
-                    </div>
-                  </div>
-                ))}
-                {chatLoading && (
-                  <div className="flex justify-start mb-2">
-                    <div className="px-4 py-2 rounded-xl bg-[#e9eef3] text-black text-sm animate-pulse">
-                      Thinking...
-                    </div>
-                  </div>
-                )}
-              </div>
-              <form
-                className="flex gap-2"
-                onSubmit={(e) => {
+    <>
+      <Head>
+        <title>
+          {selectedUniversity
+            ? `${selectedUniversity} Papers - Papers Platform`
+            : "Papers Platform"}
+        </title>
+        <meta
+          name="description"
+          content="Find and access past question papers for your university. Search by course, exam, or year."
+        />
+      </Head>
+      <div className="min-h-screen bg-[#f7f9fb]">
+        {/* Navbar */}
+        <nav className="w-full flex items-center justify-between px-8 py-4 bg-white border-b border-gray-200">
+          <div className="flex items-center gap-8">
+            <span className="font-bold text-2xl tracking-tight flex items-center gap-2">
+              Papers
+            </span>
+            <div className="hidden md:flex gap-6 text-sm font-medium text-gray-700">
+              <a
+                href="/home"
+                onClick={(e) => {
                   e.preventDefault();
-                  handleAskAI();
+                  router.refresh();
                 }}
-                autoComplete="off"
+                className="hover:text-black font-semibold text-black"
               >
+                Dashboard
+              </a>
+              <a href="/subjects" className="hover:text-black">
+                Subjects
+              </a>
+              <a href="/upload" className="hover:text-black">
+                Upload Paper
+              </a>
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            {/* University Dropdown */}
+            <select
+              aria-label="Select university"
+              className="rounded-full bg-[#f2f4f7] px-4 py-2 text-sm border border-gray-200 focus:border-gray-400 outline-none min-w-[180px]"
+              value={selectedUniversity}
+              onChange={(e) => setSelectedUniversity(e.target.value)}
+            >
+              {universities.map((uni) => (
+                <option key={uni.id} value={uni.name}>
+                  {uni.name}
+                </option>
+              ))}
+            </select>
+            {/* Profile Initials Dropdown */}
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={() => setDropdownOpen((v) => !v)}
+                className="w-9 h-9 rounded-full bg-[#d1e0e9] flex items-center justify-center font-bold text-lg text-[#2a3a4a] border border-gray-200 hover:shadow"
+                title="Profile"
+              >
+                {getInitials() || "--"}
+              </button>
+              {dropdownOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 z-50">
+                  <button
+                    className="w-full text-left px-4 py-3 hover:bg-gray-100 rounded-t-lg"
+                    onClick={() => {
+                      setDropdownOpen(false);
+                      router.push("/profile");
+                    }}
+                  >
+                    Profile Information
+                  </button>
+                  <button
+                    className="w-full text-left px-4 py-3 hover:bg-gray-100 rounded-b-lg text-red-600"
+                    onClick={handleLogout}
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </nav>
+
+        {/* Main Content */}
+        <div className="flex flex-col lg:flex-row gap-8 px-8 py-8 max-w-7xl mx-auto">
+          {/* Left: Recent Papers */}
+          <div className="flex-1 min-w-0">
+            <h2 className="text-2xl font-bold mb-6">
+              {selectedUniversity} Papers
+            </h2>
+            <div className="mb-8">
+              <div className="relative">
                 <input
                   type="text"
-                  className="flex-1 rounded-lg border border-gray-200 px-4 py-2 bg-white text-base focus:border-black outline-none"
-                  placeholder="Type your question..."
-                  value={chatInput}
-                  onChange={(e) => setChatInput(e.target.value)}
-                  disabled={chatLoading}
+                  placeholder="Search by course name, code, exam name, or year"
+                  className="w-full rounded-xl bg-[#e9eef3] px-4 py-3 pl-10 text-base border border-gray-200 focus:border-gray-400 outline-none"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                 />
-                <button
-                  type="submit"
-                  className="bg-black text-white font-semibold rounded-lg px-4 py-2 disabled:opacity-60"
-                  disabled={chatLoading || !chatInput.trim()}
-                >
-                  Send
-                </button>
-              </form>
+                <span className="absolute left-3 top-3 text-gray-400">
+                  <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
+                    <path
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1 0 6.5 6.5a7.5 7.5 0 0 0 10.6 10.6Z"
+                    />
+                  </svg>
+                </span>
+              </div>
             </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              {currentPapers.length === 0 && (
+                <div className="col-span-full text-gray-500 text-center py-8">
+                  {searchTerm
+                    ? "No papers found matching your search."
+                    : "No papers found for this university."}
+                </div>
+              )}
+              {currentPapers.map((paper) => (
+                <div
+                  key={paper.id}
+                  className="bg-white rounded-2xl overflow-hidden shadow-sm flex flex-col border border-gray-200 hover:border-gray-400 transition"
+                >
+                  <div className="aspect-[1/1] bg-[#f2f4f7] flex items-center justify-center p-4">
+                    <a
+                      href={paper.pdf_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full h-full flex items-center justify-center hover:bg-[#e9eef3] transition-colors rounded-xl"
+                    >
+                      <div className="flex flex-col items-center gap-2">
+                        <svg
+                          width="48"
+                          height="48"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            clipRule="evenodd"
+                            d="M8.707 4.293a1 1 0 0 1 0 1.414L5.414 9H17a1 1 0 1 1 0 2H5.414l3.293 3.293a1 1 0 0 1-1.414 1.414l-5-5a1 1 0 0 1 0-1.414l5-5a1 1 0 0 1 1.414 0Z"
+                            fill="#6B7280"
+                          />
+                        </svg>
+                        <span className="text-sm text-gray-600">View PDF</span>
+                      </div>
+                    </a>
+                  </div>
+                  <div className="p-4 flex flex-col gap-2">
+                    <div className="font-semibold text-base">
+                      {paper.course_name}
+                    </div>
+                    <div className="flex flex-wrap gap-2 text-xs">
+                      <span className="bg-[#d1e0e9] text-[#2a3a4a] rounded-full px-3 py-1">
+                        {paper.course_code}
+                      </span>
+                      <span className="bg-[#c6d9b7] text-[#3a4a2a] rounded-full px-3 py-1">
+                        {paper.exam_name}
+                      </span>
+                      <span className="bg-[#e9c6b7] text-[#4a3a2a] rounded-full px-3 py-1">
+                        {paper.exam_year}
+                      </span>
+                    </div>
+                    <div className="text-gray-400 text-xs">
+                      Uploaded{" "}
+                      {new Date(paper.uploaded_at).toLocaleDateString()}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {/* Pagination */}
+            {filteredPapers.length > papersPerPage && (
+              <div className="flex justify-center gap-4 mt-8">
+                <button
+                  onClick={handlePrevPage}
+                  disabled={currentPage === 1}
+                  className="bg-black text-white font-semibold rounded-xl py-2 px-6 transition disabled:opacity-60"
+                >
+                  Previous Page
+                </button>
+                <button
+                  onClick={handleNextPage}
+                  disabled={currentPage === totalPages}
+                  className="bg-black text-white font-semibold rounded-xl py-2 px-6 transition disabled:opacity-60"
+                >
+                  Next Page
+                </button>
+              </div>
+            )}
           </div>
-        </>
-      )}
-    </div>
+          {/* Right: Ask AI */}
+          <aside className="w-full lg:w-[320px] flex-shrink-0">
+            <div className="bg-white rounded-2xl shadow p-6 mb-6">
+              <h3 className="font-semibold text-lg mb-4">Ask AI</h3>
+              <div className="flex flex-col gap-3 text-sm text-gray-700 mb-4">
+                <div className="font-medium">Suggested Prompts:</div>
+                {suggestedPrompts.map((prompt, index) => (
+                  <button
+                    key={index}
+                    className="text-left bg-[#e9eef3] hover:bg-[#dbe3ea] transition rounded-lg px-3 py-2 cursor-pointer"
+                    onClick={() => handleSuggestedPromptClick(prompt)}
+                  >
+                    {prompt}
+                  </button>
+                ))}
+              </div>
+              <button
+                className="w-full bg-[#e9eef3] text-black font-semibold rounded-xl py-2 mt-2 hover:bg-[#dbe3ea] transition"
+                onClick={() => setShowChatModal(true)}
+              >
+                Ask AI
+              </button>
+            </div>
+          </aside>
+        </div>
+        {/* Chat Modal */}
+        {showChatModal && (
+          <>
+            <div
+              className="fixed inset-0 bg-black/40 z-40"
+              onClick={() => setShowChatModal(false)}
+            />
+            <div className="fixed inset-0 z-50 flex items-center justify-center">
+              <div className="bg-white rounded-2xl border border-gray-200 p-6 w-full max-w-md shadow-xl relative flex flex-col h-[80vh]">
+                <button
+                  className="absolute top-4 right-4 text-2xl text-gray-400 hover:text-black"
+                  onClick={() => setShowChatModal(false)}
+                  aria-label="Close"
+                >
+                  &times;
+                </button>
+                <h4 className="text-lg font-semibold mb-2">Ask AI</h4>
+                <div className="flex-1 overflow-y-auto mb-4 border rounded-lg p-2 bg-[#f7f9fb]">
+                  {chatMessages.length === 0 && (
+                    <div className="text-gray-400 text-center py-8">
+                      Ask anything about papers, exams, or universities!
+                    </div>
+                  )}
+                  {chatMessages.map((msg, i) => (
+                    <div
+                      key={i}
+                      className={`mb-2 flex ${
+                        msg.role === "user" ? "justify-end" : "justify-start"
+                      }`}
+                    >
+                      <div
+                        className={`px-4 py-2 rounded-xl max-w-[80%] text-sm ${
+                          msg.role === "user"
+                            ? "bg-black text-white"
+                            : "bg-[#e9eef3] text-black"
+                        }`}
+                      >
+                        {msg.text}
+                      </div>
+                    </div>
+                  ))}
+                  {chatLoading && (
+                    <div className="flex justify-start mb-2">
+                      <div className="px-4 py-2 rounded-xl bg-[#e9eef3] text-black text-sm animate-pulse">
+                        Thinking...
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <form
+                  className="flex gap-2"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleAskAI();
+                  }}
+                  autoComplete="off"
+                >
+                  <input
+                    type="text"
+                    className="flex-1 rounded-lg border border-gray-200 px-4 py-2 bg-white text-base focus:border-black outline-none"
+                    placeholder="Type your question..."
+                    value={chatInput}
+                    onChange={(e) => setChatInput(e.target.value)}
+                    disabled={chatLoading}
+                  />
+                  <button
+                    type="submit"
+                    className="bg-black text-white font-semibold rounded-lg px-4 py-2 disabled:opacity-60"
+                    disabled={chatLoading || !chatInput.trim()}
+                  >
+                    Send
+                  </button>
+                </form>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    </>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import Head from "next/head";
 
 export default function ProfilePage() {
   const [tab, setTab] = useState<"personal" | "contributor">("personal");
@@ -126,248 +127,265 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f7f9fb] px-4 py-8">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Profile</h1>
-        {/* Tabs */}
-        <div className="flex gap-8 border-b border-gray-200 mb-8">
-          <button
-            className={`pb-2 font-medium text-base border-b-2 transition-all ${
-              tab === "personal"
-                ? "border-gray-800 text-black"
-                : "border-transparent text-gray-500"
-            }`}
-            onClick={() => setTab("personal")}
-          >
-            Personal Information
-          </button>
-          <button
-            className={`pb-2 font-medium text-base border-b-2 transition-all ${
-              tab === "contributor"
-                ? "border-gray-800 text-black"
-                : "border-transparent text-gray-500"
-            }`}
-            onClick={() => setTab("contributor")}
-          >
-            Contributor Page
-          </button>
-        </div>
-        {/* Tab Content */}
-        {tab === "personal" && (
-          <div className="max-w-2xl">
-            <h2 className="text-xl font-semibold mb-4">Personal Information</h2>
-            <div className="mb-4">
-              <label className="block mb-1 font-medium">Name</label>
-              <input
-                type="text"
-                value={fullName}
-                readOnly
-                aria-label="Full Name"
-                className="w-full rounded-lg border border-gray-200 px-4 py-3 bg-white text-base focus:border-black outline-none"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block mb-1 font-medium">Email</label>
-              <input
-                type="text"
-                value={email}
-                readOnly
-                aria-label="Email"
-                className="w-full rounded-lg border border-gray-200 px-4 py-3 bg-white text-base focus:border-black outline-none"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block mb-1 font-medium">University Name</label>
-              <input
-                type="text"
-                value={profile?.university_name || ""}
-                readOnly
-                aria-label="University Name"
-                className="w-full rounded-lg border border-gray-200 px-4 py-3 bg-white text-base focus:border-black outline-none"
-              />
-            </div>
+    <>
+      <Head>
+        <title>My Profile - Papers Platform</title>
+        <meta
+          name="description"
+          content="View and update your personal and contributor information on Papers Platform."
+        />
+      </Head>
+      <div className="min-h-screen bg-[#f7f9fb] px-4 py-8">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-3xl font-bold mb-8">Profile</h1>
+          {/* Tabs */}
+          <div className="flex gap-8 border-b border-gray-200 mb-8">
+            <button
+              className={`pb-2 font-medium text-base border-b-2 transition-all ${
+                tab === "personal"
+                  ? "border-gray-800 text-black"
+                  : "border-transparent text-gray-500"
+              }`}
+              onClick={() => setTab("personal")}
+            >
+              Personal Information
+            </button>
+            <button
+              className={`pb-2 font-medium text-base border-b-2 transition-all ${
+                tab === "contributor"
+                  ? "border-gray-800 text-black"
+                  : "border-transparent text-gray-500"
+              }`}
+              onClick={() => setTab("contributor")}
+            >
+              Contributor Page
+            </button>
           </div>
-        )}
-        {tab === "contributor" && (
-          <div className="max-w-2xl">
-            <h2 className="text-xl font-semibold mb-4">Contributor Page</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
-              <div className="bg-white rounded-lg border border-gray-200 p-6 flex flex-col items-center">
-                <div className="text-3xl font-bold mb-1">{papersUploaded}</div>
-                <div className="text-gray-500 text-base">Papers Uploaded</div>
+          {/* Tab Content */}
+          {tab === "personal" && (
+            <div className="max-w-2xl">
+              <h2 className="text-xl font-semibold mb-4">
+                Personal Information
+              </h2>
+              <div className="mb-4">
+                <label className="block mb-1 font-medium">Name</label>
+                <input
+                  type="text"
+                  value={fullName}
+                  readOnly
+                  aria-label="Full Name"
+                  className="w-full rounded-lg border border-gray-200 px-4 py-3 bg-white text-base focus:border-black outline-none"
+                />
               </div>
-              <div className="bg-white rounded-lg border border-gray-200 p-6 flex flex-col items-center">
-                <div className="text-3xl font-bold mb-1">
-                  {contributorSince}
-                </div>
-                <div className="text-gray-500 text-base">Contributor Since</div>
+              <div className="mb-4">
+                <label className="block mb-1 font-medium">Email</label>
+                <input
+                  type="text"
+                  value={email}
+                  readOnly
+                  aria-label="Email"
+                  className="w-full rounded-lg border border-gray-200 px-4 py-3 bg-white text-base focus:border-black outline-none"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block mb-1 font-medium">
+                  University Name
+                </label>
+                <input
+                  type="text"
+                  value={profile?.university_name || ""}
+                  readOnly
+                  aria-label="University Name"
+                  className="w-full rounded-lg border border-gray-200 px-4 py-3 bg-white text-base focus:border-black outline-none"
+                />
               </div>
             </div>
-            <div className="flex flex-col items-center">
-              <button
-                className="bg-black text-white font-semibold rounded-xl py-3 px-6 transition hover:bg-gray-900 mb-6"
-                onClick={() => setShowUniForm(true)}
-              >
-                Add new university/College
-              </button>
-              {showUniForm && (
-                <>
-                  {/* Modal Overlay */}
-                  <div
-                    className="fixed inset-0 bg-black/40 z-40"
-                    onClick={() => setShowUniForm(false)}
-                  />
-                  {/* Modal Content */}
-                  <div className="fixed inset-0 z-50 flex items-center justify-center">
-                    <div className="bg-white rounded-2xl border border-gray-200 p-8 w-full max-w-lg shadow-xl relative">
-                      <button
-                        className="absolute top-4 right-4 text-2xl text-gray-400 hover:text-black"
-                        onClick={() => setShowUniForm(false)}
-                        aria-label="Close"
-                      >
-                        &times;
-                      </button>
-                      <form
-                        className="flex flex-col gap-4"
-                        onSubmit={handleUniSubmit}
-                        autoComplete="off"
-                      >
-                        <div className="underline font-semibold text-base mb-2">
-                          University Information
-                        </div>
-                        <div>
-                          <label className="block mb-1 font-medium">
-                            University/College Name
-                            <span className="text-red-500">*</span>
-                          </label>
-                          <input
-                            type="text"
-                            name="name"
-                            value={uni.name}
-                            onChange={handleUniChange}
-                            required
-                            className="w-full rounded-lg border border-gray-200 px-4 py-3 bg-white text-base focus:border-black outline-none"
-                            placeholder="e.g. VIT Vellore"
-                          />
-                        </div>
-                        <div>
-                          <label className="block mb-1 font-medium">
-                            Country<span className="text-red-500">*</span>
-                          </label>
-                          <input
-                            type="text"
-                            name="country"
-                            value={uni.country}
-                            onChange={handleUniChange}
-                            required
-                            className="w-full rounded-lg border border-gray-200 px-4 py-3 bg-white text-base focus:border-black outline-none"
-                            placeholder="e.g. India"
-                          />
-                        </div>
-                        <div>
-                          <label className="block mb-1 font-medium">
-                            Number of exams
-                            <span className="text-red-500">*</span>
-                          </label>
-                          <input
-                            type="number"
-                            name="number_of_exams"
-                            min={1}
-                            max={4}
-                            value={uni.number_of_exams}
-                            onChange={handleNumExams}
-                            required
-                            aria-label="Number of Exams"
-                            className="w-full rounded-lg border border-gray-200 px-4 py-3 bg-white text-base focus:border-black outline-none"
-                          />
-                        </div>
-                        <div>
-                          <label className="block mb-1 font-medium">
-                            Exam Names
-                            <span className="text-red-500">*</span>
-                          </label>
-                          <div className="flex flex-col gap-2">
-                            {Array.from({ length: uni.number_of_exams }).map(
-                              (_, i) => (
-                                <input
-                                  key={i}
-                                  type="text"
-                                  value={uni.exam_names[i] || ""}
-                                  onChange={(e) =>
-                                    handleExamName(i, e.target.value)
-                                  }
-                                  required
-                                  className="w-full rounded-lg border border-gray-200 px-4 py-3 bg-white text-base focus:border-black outline-none"
-                                  placeholder={`Exam ${i + 1} Name`}
-                                />
-                              )
-                            )}
-                          </div>
-                        </div>
-                        <div>
-                          <label className="block mb-1 font-medium">
-                            Official Website (optional)
-                          </label>
-                          <input
-                            type="url"
-                            name="official_website"
-                            value={uni.official_website}
-                            onChange={handleUniChange}
-                            className="w-full rounded-lg border border-gray-200 px-4 py-3 bg-white text-base focus:border-black outline-none"
-                            placeholder="https://www.example.edu"
-                          />
-                        </div>
-                        {uniError && (
-                          <div className="text-red-500 text-sm mt-1">
-                            {uniError}
-                          </div>
-                        )}
-                        {uniSuccess && (
-                          <div className="flex flex-col items-center gap-2 text-green-700 text-base mt-1 animate-fade-in">
-                            <svg
-                              className="w-10 h-10 text-green-500 animate-bounce"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                              strokeWidth={2}
-                            >
-                              <circle
-                                cx="12"
-                                cy="12"
-                                r="10"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                fill="#d1fae5"
-                              />
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M8 12l2.5 2.5L16 9"
-                              />
-                            </svg>
-                            <span className="font-semibold text-center">
-                              University added successfully!
-                              <br />
-                              Start uploading papers and earn with every view.
-                            </span>
-                          </div>
-                        )}
-                        <button
-                          type="submit"
-                          className="mt-2 bg-black text-white font-semibold rounded-xl py-3 transition disabled:opacity-60"
-                          disabled={uniLoading || uniSuccess}
-                        >
-                          {uniLoading ? "Submitting..." : "Submit"}
-                        </button>
-                      </form>
-                    </div>
+          )}
+          {tab === "contributor" && (
+            <div className="max-w-2xl">
+              <h2 className="text-xl font-semibold mb-4">Contributor Page</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+                <div className="bg-white rounded-lg border border-gray-200 p-6 flex flex-col items-center">
+                  <div className="text-3xl font-bold mb-1">
+                    {papersUploaded}
                   </div>
-                </>
-              )}
+                  <div className="text-gray-500 text-base">Papers Uploaded</div>
+                </div>
+                <div className="bg-white rounded-lg border border-gray-200 p-6 flex flex-col items-center">
+                  <div className="text-3xl font-bold mb-1">
+                    {contributorSince}
+                  </div>
+                  <div className="text-gray-500 text-base">
+                    Contributor Since
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-col items-center">
+                <button
+                  className="bg-black text-white font-semibold rounded-xl py-3 px-6 transition hover:bg-gray-900 mb-6"
+                  onClick={() => setShowUniForm(true)}
+                >
+                  Add new university/College
+                </button>
+                {showUniForm && (
+                  <>
+                    {/* Modal Overlay */}
+                    <div
+                      className="fixed inset-0 bg-black/40 z-40"
+                      onClick={() => setShowUniForm(false)}
+                    />
+                    {/* Modal Content */}
+                    <div className="fixed inset-0 z-50 flex items-center justify-center">
+                      <div className="bg-white rounded-2xl border border-gray-200 p-8 w-full max-w-lg shadow-xl relative">
+                        <button
+                          className="absolute top-4 right-4 text-2xl text-gray-400 hover:text-black"
+                          onClick={() => setShowUniForm(false)}
+                          aria-label="Close"
+                        >
+                          &times;
+                        </button>
+                        <form
+                          className="flex flex-col gap-4"
+                          onSubmit={handleUniSubmit}
+                          autoComplete="off"
+                        >
+                          <div className="underline font-semibold text-base mb-2">
+                            University Information
+                          </div>
+                          <div>
+                            <label className="block mb-1 font-medium">
+                              University/College Name
+                              <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                              type="text"
+                              name="name"
+                              value={uni.name}
+                              onChange={handleUniChange}
+                              required
+                              className="w-full rounded-lg border border-gray-200 px-4 py-3 bg-white text-base focus:border-black outline-none"
+                              placeholder="e.g. VIT Vellore"
+                            />
+                          </div>
+                          <div>
+                            <label className="block mb-1 font-medium">
+                              Country<span className="text-red-500">*</span>
+                            </label>
+                            <input
+                              type="text"
+                              name="country"
+                              value={uni.country}
+                              onChange={handleUniChange}
+                              required
+                              className="w-full rounded-lg border border-gray-200 px-4 py-3 bg-white text-base focus:border-black outline-none"
+                              placeholder="e.g. India"
+                            />
+                          </div>
+                          <div>
+                            <label className="block mb-1 font-medium">
+                              Number of exams
+                              <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                              type="number"
+                              name="number_of_exams"
+                              min={1}
+                              max={4}
+                              value={uni.number_of_exams}
+                              onChange={handleNumExams}
+                              required
+                              aria-label="Number of Exams"
+                              className="w-full rounded-lg border border-gray-200 px-4 py-3 bg-white text-base focus:border-black outline-none"
+                            />
+                          </div>
+                          <div>
+                            <label className="block mb-1 font-medium">
+                              Exam Names
+                              <span className="text-red-500">*</span>
+                            </label>
+                            <div className="flex flex-col gap-2">
+                              {Array.from({ length: uni.number_of_exams }).map(
+                                (_, i) => (
+                                  <input
+                                    key={i}
+                                    type="text"
+                                    value={uni.exam_names[i] || ""}
+                                    onChange={(e) =>
+                                      handleExamName(i, e.target.value)
+                                    }
+                                    required
+                                    className="w-full rounded-lg border border-gray-200 px-4 py-3 bg-white text-base focus:border-black outline-none"
+                                    placeholder={`Exam ${i + 1} Name`}
+                                  />
+                                )
+                              )}
+                            </div>
+                          </div>
+                          <div>
+                            <label className="block mb-1 font-medium">
+                              Official Website (optional)
+                            </label>
+                            <input
+                              type="url"
+                              name="official_website"
+                              value={uni.official_website}
+                              onChange={handleUniChange}
+                              className="w-full rounded-lg border border-gray-200 px-4 py-3 bg-white text-base focus:border-black outline-none"
+                              placeholder="https://www.example.edu"
+                            />
+                          </div>
+                          {uniError && (
+                            <div className="text-red-500 text-sm mt-1">
+                              {uniError}
+                            </div>
+                          )}
+                          {uniSuccess && (
+                            <div className="flex flex-col items-center gap-2 text-green-700 text-base mt-1 animate-fade-in">
+                              <svg
+                                className="w-10 h-10 text-green-500 animate-bounce"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                strokeWidth={2}
+                              >
+                                <circle
+                                  cx="12"
+                                  cy="12"
+                                  r="10"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  fill="#d1fae5"
+                                />
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M8 12l2.5 2.5L16 9"
+                                />
+                              </svg>
+                              <span className="font-semibold text-center">
+                                University added successfully!
+                                <br />
+                                Start uploading papers and earn with every view.
+                              </span>
+                            </div>
+                          )}
+                          <button
+                            type="submit"
+                            className="mt-2 bg-black text-white font-semibold rounded-xl py-3 transition disabled:opacity-60"
+                            disabled={uniLoading || uniSuccess}
+                          >
+                            {uniLoading ? "Submitting..." : "Submit"}
+                          </button>
+                        </form>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
       <style jsx global>{`
         @keyframes fade-in {
@@ -384,6 +402,6 @@ export default function ProfilePage() {
           animation: fade-in 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
         }
       `}</style>
-    </div>
+    </>
   );
 }
