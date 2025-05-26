@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function ProfilePage() {
@@ -9,9 +8,8 @@ export default function ProfilePage() {
   const [email, setEmail] = useState("");
   const [papersUploaded, setPapersUploaded] = useState(0);
   const [contributorSince, setContributorSince] = useState("");
-  const router = useRouter();
   const [showUniForm, setShowUniForm] = useState(false);
-  const [uni, setUni] = useState({
+  const [uni, setUni] = useState<any>({
     name: "",
     country: "",
     number_of_exams: 1,
@@ -69,7 +67,7 @@ export default function ProfilePage() {
     let value = parseInt(e.target.value, 10);
     if (isNaN(value) || value < 1) value = 1;
     if (value > 4) value = 4;
-    setUni((prev) => ({
+    setUni((prev: any) => ({
       ...prev,
       number_of_exams: value,
       exam_names: Array(value)
@@ -78,7 +76,7 @@ export default function ProfilePage() {
     }));
   };
   const handleExamName = (i: number, value: string) => {
-    setUni((prev) => {
+    setUni((prev: any) => {
       const updated = [...prev.exam_names];
       updated[i] = value;
       return { ...prev, exam_names: updated };
@@ -88,7 +86,11 @@ export default function ProfilePage() {
     e.preventDefault();
     setUniError("");
     setUniSuccess(false);
-    if (!uni.name || !uni.country || !uni.exam_names.every((n) => n.trim())) {
+    if (
+      !uni.name ||
+      !uni.country ||
+      !uni.exam_names.every((n: any) => n.trim())
+    ) {
       setUniError("Please fill all required fields.");
       return;
     }

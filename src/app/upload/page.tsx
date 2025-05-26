@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import { PDFDocument } from "pdf-lib";
 
 export default function UploadPage() {
-  const [universities, setUniversities] = useState<any[]>([]);
+  const [universities, setUniversities] = useState<any[]>([]);  
   const [university, setUniversity] = useState("");
   const [universityId, setUniversityId] = useState<string | null>(null);
   const [examNames, setExamNames] = useState<string[]>([]);
@@ -92,6 +92,7 @@ export default function UploadPage() {
     file.type === "application/pdf";
 
   async function compressPdfToUnderHalfMB(inputPdf: File): Promise<Blob> {
+     
     console.log("Original PDF size:", (inputPdf.size / 1024).toFixed(2), "KB");
     const buffer = await inputPdf.arrayBuffer();
 
@@ -320,7 +321,7 @@ export default function UploadPage() {
     uploading: "Uploading PDF",
   };
 
-  type UploadStepKey = keyof typeof stepNames;
+  type UploadStepKey = keyof typeof stepNames;  
 
   const getStepStatus = (step: UploadStepKey) => {
     const stepOrder: UploadStepKey[] = [
@@ -569,7 +570,7 @@ export default function UploadPage() {
                   }}
                 />
 
-                {Object.entries(stepNames).map(([key, name], index) => (
+                {Object.entries(stepNames).map(([key, name]) => (
                   <div
                     key={key}
                     className="flex flex-col items-center z-20 w-1/4"

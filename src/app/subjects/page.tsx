@@ -19,8 +19,8 @@ interface GroupedPapers {
 
 export default function SubjectsPage() {
   const router = useRouter();
-  const [userProfile, setUserProfile] = useState<any>(null);
-  const [universities, setUniversities] = useState<any[]>([]);
+  const [userProfile, setUserProfile] = useState<any>(null); // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [universities, setUniversities] = useState<any[]>([]);  
   const [selectedUniversity, setSelectedUniversity] = useState<string>("");
   const [selectedUniversityId, setSelectedUniversityId] = useState<
     string | null
@@ -53,7 +53,7 @@ export default function SubjectsPage() {
           setError("Failed to fetch user profile.");
         }
         if (data) {
-          setUserProfile(data);
+          setUserProfile(data);  
           userUni = data.university_name;
         }
       }
@@ -67,9 +67,9 @@ export default function SubjectsPage() {
       }
 
       if (uniData) {
-        setUniversities(uniData);
+        setUniversities(uniData);  
         // Set default selected university to user's university
-        const defaultUni = uniData.find((u: any) => u.name === userUni);
+        const defaultUni = uniData.find((u: any) => u.name === userUni);  
         const initialUni = defaultUni ? defaultUni : uniData[0];
         setSelectedUniversity(initialUni?.name || "");
         setSelectedUniversityId(initialUni?.id || null);
@@ -108,6 +108,7 @@ export default function SubjectsPage() {
         setGroupedPapers({});
       } else if (data) {
         const grouped: GroupedPapers = data.reduce((acc, paper) => {
+           
           const courseName = paper.course_name;
           if (!acc[courseName]) {
             acc[courseName] = [];

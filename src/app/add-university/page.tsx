@@ -24,9 +24,9 @@ export default function AddUniversityPage() {
   const [uni, setUni] = useState({
     name: "",
     country: "",
-    numSemesters: 1,
-    semesterNames: [""],
-    website: "",
+    number_of_exams: 1,
+    exam_names: [""],
+    official_website: "",
   });
   const [uniLoading, setUniLoading] = useState(false);
   const [uniError, setUniError] = useState("");
@@ -97,23 +97,23 @@ export default function AddUniversityPage() {
   const handleUniChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUni({ ...uni, [e.target.name]: e.target.value });
   };
-  const handleNumSemesters = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleNumExams = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = parseInt(e.target.value, 10);
     if (isNaN(value) || value < 1) value = 1;
     if (value > 4) value = 4;
     setUni((prev) => ({
       ...prev,
-      numSemesters: value,
-      semesterNames: Array(value)
+      number_of_exams: value,
+      exam_names: Array(value)
         .fill("")
-        .map((_, i) => prev.semesterNames[i] || ""),
+        .map((_, i) => prev.exam_names[i] || ""),
     }));
   };
-  const handleSemesterName = (i: number, value: string) => {
+  const handleExamName = (i: number, value: string) => {
     setUni((prev) => {
-      const updated = [...prev.semesterNames];
+      const updated = [...prev.exam_names];
       updated[i] = value;
-      return { ...prev, semesterNames: updated };
+      return { ...prev, exam_names: updated };
     });
   };
 
@@ -121,11 +121,7 @@ export default function AddUniversityPage() {
     e.preventDefault();
     setUniError("");
     setUniSuccess(false);
-    if (
-      !uni.name ||
-      !uni.country ||
-      !uni.semesterNames.every((n) => n.trim())
-    ) {
+    if (!uni.name || !uni.country || !uni.exam_names.every((n) => n.trim())) {
       setUniError("Please fill all required fields.");
       return;
     }
@@ -138,9 +134,9 @@ export default function AddUniversityPage() {
       {
         name: uni.name,
         country: uni.country,
-        number_of_exams: uni.numSemesters,
-        exam_names: uni.semesterNames,
-        official_website: uni.website || null,
+        number_of_exams: uni.number_of_exams,
+        exam_names: uni.exam_names,
+        official_website: uni.official_website || null,
         added_by_user_id,
         created_at: now,
       },
@@ -166,22 +162,22 @@ export default function AddUniversityPage() {
             <p className="mb-2">
               We believe your contribution should be rewarded.
               <br />
-              If your university or college isn't listed yet, you can add it to
-              our platform and start earning 1% of all ad revenue generated from
-              papers uploaded under your university.
+              If your university or college isn&apos;t listed yet, you can add
+              it to our platform and start earning 1% of all ad revenue
+              generated from papers uploaded under your university.
             </p>
             <p className="mb-2">
-              It's 100% free to join, and there's no catch.
+              It&apos;s 100% free to join, and there&apos;s no catch.
             </p>
             <p className="mb-2">
-              Every end of the month, we'll send you an email with your total
-              earnings. From there, you'll be able to provide your payment
-              details and withdraw to your preferred account — simple, safe, and
-              transparent.
+              Every end of the month, we&apos;ll send you an email with your
+              total earnings. From there, you&apos;ll be able to provide your
+              payment details and withdraw to your preferred account — simple,
+              safe, and transparent.
             </p>
             <p className="mb-2">
-              We don't collect payment info upfront to protect your privacy and
-              build mutual trust first.
+              We don&apos;t collect payment info upfront to protect your privacy
+              and build mutual trust first.
               <br />
               You get full control over when and how to receive your earnings.
             </p>
@@ -316,7 +312,8 @@ export default function AddUniversityPage() {
             </div>
             <div>
               <label className="block mb-1 font-medium">
-                University/College Name<span className="text-red-500">*</span>
+                University/College Name
+                <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -349,27 +346,28 @@ export default function AddUniversityPage() {
               </label>
               <input
                 type="number"
-                name="numSemesters"
+                name="number_of_exams"
                 min={1}
                 max={4}
-                value={uni.numSemesters}
-                onChange={handleNumSemesters}
+                value={uni.number_of_exams}
+                onChange={handleNumExams}
                 required
-                aria-label="Number of Semesters per Year"
+                aria-label="Number of Exams"
                 className="w-full rounded-lg border border-gray-200 px-4 py-3 bg-white text-base focus:border-black outline-none"
               />
             </div>
             <div>
               <label className="block mb-1 font-medium">
-                Exam Names<span className="text-red-500">*</span>
+                Exam Names
+                <span className="text-red-500">*</span>
               </label>
               <div className="flex flex-col gap-2">
-                {Array.from({ length: uni.numSemesters }).map((_, i) => (
+                {Array.from({ length: uni.number_of_exams }).map((_, i) => (
                   <input
                     key={i}
                     type="text"
-                    value={uni.semesterNames[i] || ""}
-                    onChange={(e) => handleSemesterName(i, e.target.value)}
+                    value={uni.exam_names[i] || ""}
+                    onChange={(e) => handleExamName(i, e.target.value)}
                     required
                     className="w-full rounded-lg border border-gray-200 px-4 py-3 bg-white text-base focus:border-black outline-none"
                     placeholder={`Exam ${i + 1} Name`}
@@ -383,8 +381,8 @@ export default function AddUniversityPage() {
               </label>
               <input
                 type="url"
-                name="website"
-                value={uni.website}
+                name="official_website"
+                value={uni.official_website}
                 onChange={handleUniChange}
                 className="w-full rounded-lg border border-gray-200 px-4 py-3 bg-white text-base focus:border-black outline-none"
                 placeholder="https://www.example.edu"

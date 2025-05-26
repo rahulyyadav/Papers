@@ -1,10 +1,6 @@
 "use client";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
 
 export default function Home() {
-  const router = useRouter();
-
   return (
     <div className="min-h-screen flex flex-col bg-white text-black relative">
       {/* Header */}

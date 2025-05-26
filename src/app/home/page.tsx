@@ -2,18 +2,17 @@
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
-import Image from "next/image";
 
 export default function HomePage() {
   const router = useRouter();
-  const [userProfile, setUserProfile] = useState<any>(null);
-  const [universities, setUniversities] = useState<any[]>([]);
+  const [userProfile, setUserProfile] = useState<any>(null); // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [universities, setUniversities] = useState<any[]>([]); // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [selectedUniversity, setSelectedUniversity] = useState<string>("");
   const [selectedUniversityId, setSelectedUniversityId] = useState<
     string | null
   >(null);
-  const [papers, setPapers] = useState<any[]>([]);
-  const [filteredPapers, setFilteredPapers] = useState<any[]>([]);
+  const [papers, setPapers] = useState<any[]>([]); // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [filteredPapers, setFilteredPapers] = useState<any[]>([]); // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [searchTerm, setSearchTerm] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -78,7 +77,7 @@ export default function HomePage() {
           .eq("user_id", user.id)
           .single();
         if (data) {
-          setUserProfile(data);
+          setUserProfile(data); // eslint-disable-next-line @typescript-eslint/no-explicit-any
           userUni = data.university_name;
         }
       }
@@ -87,9 +86,9 @@ export default function HomePage() {
         .from("universities")
         .select("id, name");
       if (uniData) {
-        setUniversities(uniData);
+        setUniversities(uniData); // eslint-disable-next-line @typescript-eslint/no-explicit-any
         // Set default selected university to user's university
-        const defaultUni = uniData.find((u: any) => u.name === userUni);
+        const defaultUni = uniData.find((u: any) => u.name === userUni); // eslint-disable-next-line @typescript-eslint/no-explicit-any
         setSelectedUniversity(
           defaultUni ? defaultUni.name : uniData[0]?.name || ""
         );
