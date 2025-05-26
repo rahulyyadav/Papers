@@ -1,36 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Papers Platform
+
+## Overview
+
+Papers is a Next.js application that allows users to share past examination papers from universities and colleges. Contributors are compensated based on the advertisement revenue generated through their uploaded content.
+
+## Features
+
+- **Login and Signup**: Users can log in or sign up using email, password, or Google authentication.
+- **Home Page**: Displays a navbar, search functionality, recent papers, and an "Ask AI" sidebar.
+- **Profile Page**: Users can view and update their personal and contributor information.
+- **Upload Page**: Users can upload PDFs to Supabase Storage and insert records into the `question-papers` table.
+- **Revenue Model**: Details the revenue distribution and payment process for contributors.
+- **Subjects Page**: Displays papers grouped by course name for the selected university.
+
+## Tech Stack
+
+- **Frontend**: Next.js, React, Tailwind CSS
+- **Backend**: Supabase (Authentication, Storage, Database)
+- **AI Integration**: Google Generative AI SDK
 
 ## Getting Started
 
-First, run the development server:
+1. Clone the repository.
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Set up environment variables:
+   - Create a `.env.local` file in the root directory.
+   - Add the following variables:
+     ```
+     NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+     NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+     GOOGLE_API_KEY=your_google_api_key
+     ```
+4. Run the development server:
+   ```bash
+   npm run dev
+   ```
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Project Structure
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- `src/app`: Contains the main application pages and components.
+- `src/app/api`: Contains API routes for backend functionality.
+- `src/app/components`: Contains reusable components used across the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Revenue Model
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The platform compensates contributors based on the advertisement revenue generated from their uploaded content. Contributors earn 55% of the total advertising revenue from their uploads and 1% of the total ad revenue from papers uploaded under a university they added.
 
-## Learn More
+## Feedback & Support
 
-To learn more about Next.js, take a look at the following resources:
+For questions, feature suggestions, or payout-related queries, reach out at: [rahulyyadav20@outlook.com](mailto:rahulyyadav20@outlook.com)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Note
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+We are currently in the version 1 phase and are constantly improving the platform for your ease. Please keep your patience and support up. If you encounter any bugs or difficulties, please feel free to provide feedback.
