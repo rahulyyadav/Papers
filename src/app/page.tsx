@@ -13,7 +13,10 @@ export default function Home() {
           Papers<sup className="text-xs align-super">™</sup>
         </span>
         <nav className="space-x-6 hidden md:flex items-center">
-          <a href="#" className="hover:underline">
+          <a
+            href="https://github.com/rahulyyadav/Papers.git"
+            className="hover:underline"
+          >
             Contribute
           </a>
           <a href="/revenue-model" className="hover:underline">
@@ -114,7 +117,10 @@ export default function Home() {
               </a>
             </div>
             <div className="text-gray-500">
-              <a href="#" className="hover:underline">
+              <a
+                href="https://github.com/rahulyyadav/Papers.git"
+                className="hover:underline"
+              >
                 Contribute to Open Source
               </a>
             </div>

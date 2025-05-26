@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { v4 as uuidv4 } from "uuid";
+import { PDFDocument } from "pdf-lib";
 
 export default function UploadPage() {
   const [universities, setUniversities] = useState<any[]>([]);
@@ -90,6 +91,136 @@ export default function UploadPage() {
     file &&
     file.type === "application/pdf";
 
+  async function compressPdfToUnderHalfMB(inputPdf: File): Promise<Blob> {
+    console.log("Original PDF size:", (inputPdf.size / 1024).toFixed(2), "KB");
+    const buffer = await inputPdf.arrayBuffer();
+
+    // Load the PDF
+    const pdfDoc = await PDFDocument.load(buffer);
+
+    // Remove metadata
+    pdfDoc.setTitle("");
+    pdfDoc.setAuthor("");
+    pdfDoc.setSubject("");
+    pdfDoc.setKeywords([]);
+    pdfDoc.setProducer("");
+    pdfDoc.setCreator("");
+    pdfDoc.setCreationDate(new Date());
+    pdfDoc.setModificationDate(new Date());
+
+    // Get all pages
+    const pages = pdfDoc.getPages();
+    console.log("Number of pages:", pages.length);
+
+    // First pass: Aggressive page scaling
+    for (let i = 0; i < pages.length; i++) {
+      const page = pages[i];
+      const { width, height } = page.getSize();
+      console.log(
+        `Page ${i + 1} original size:`,
+        width.toFixed(0),
+        "x",
+        height.toFixed(0)
+      );
+
+      // More aggressive scaling - target 800px max dimension
+      const scale = Math.min(800 / width, 800 / height);
+      page.scale(scale, scale);
+      const newSize = page.getSize();
+      console.log(
+        `Page ${i + 1} new size:`,
+        newSize.width.toFixed(0),
+        "x",
+        newSize.height.toFixed(0)
+      );
+    }
+
+    // First compression pass
+    const compressedPdfBytes = await pdfDoc.save({
+      useObjectStreams: true,
+      addDefaultPage: false,
+      objectsPerTick: 10,
+      updateFieldAppearances: false,
+    });
+
+    console.log(
+      "First compression size:",
+      (compressedPdfBytes.byteLength / 1024).toFixed(2),
+      "KB"
+    );
+
+    // If still too large, try second pass with even more aggressive compression
+    if (compressedPdfBytes.byteLength > 500 * 1024) {
+      console.log("Applying second compression pass...");
+      const pdfDoc2 = await PDFDocument.load(compressedPdfBytes);
+      const pages = pdfDoc2.getPages();
+
+      // Second pass: Even more aggressive scaling
+      for (let i = 0; i < pages.length; i++) {
+        const page = pages[i];
+        const { width, height } = page.getSize();
+        // Target 600px max dimension
+        const scale = Math.min(600 / width, 600 / height);
+        page.scale(scale, scale);
+        const newSize = page.getSize();
+        console.log(
+          `Page ${i + 1} final size:`,
+          newSize.width.toFixed(0),
+          "x",
+          newSize.height.toFixed(0)
+        );
+      }
+
+      // Final save with maximum compression
+      const finalBytes = await pdfDoc2.save({
+        useObjectStreams: true,
+        addDefaultPage: false,
+        objectsPerTick: 5,
+        updateFieldAppearances: false,
+      });
+
+      console.log(
+        "Final compression size:",
+        (finalBytes.byteLength / 1024).toFixed(2),
+        "KB"
+      );
+
+      // If still too large, try one final pass
+      if (finalBytes.byteLength > 500 * 1024) {
+        console.log("Applying final compression pass...");
+        const pdfDoc3 = await PDFDocument.load(finalBytes);
+        const pages = pdfDoc3.getPages();
+
+        // Final pass: Maximum scaling
+        for (let i = 0; i < pages.length; i++) {
+          const page = pages[i];
+          const { width, height } = page.getSize();
+          // Target 400px max dimension
+          const scale = Math.min(400 / width, 400 / height);
+          page.scale(scale, scale);
+        }
+
+        const ultraCompressedBytes = await pdfDoc3.save({
+          useObjectStreams: true,
+          addDefaultPage: false,
+          objectsPerTick: 1,
+          updateFieldAppearances: false,
+        });
+
+        console.log(
+          "Ultra compression size:",
+          (ultraCompressedBytes.byteLength / 1024).toFixed(2),
+          "KB"
+        );
+        return new Blob([ultraCompressedBytes], { type: "application/pdf" });
+      }
+
+      return new Blob([finalBytes], { type: "application/pdf" });
+    }
+
+    return new Blob([compressedPdfBytes], { type: "application/pdf" });
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -117,8 +248,13 @@ export default function UploadPage() {
       await new Promise((resolve) => setTimeout(resolve, 500));
       setUploadStep("compressing");
 
-      // 3. Compressing PDF Size (Placeholder)
-      // Future implementation goes here
+      // 3. Compressing PDF Size
+      if (!file) throw new Error("No file selected");
+      const compressedPdf = await compressPdfToUnderHalfMB(file);
+      const compressedFile = new File([compressedPdf], file.name, {
+        type: "application/pdf",
+      });
+
       await new Promise((resolve) => setTimeout(resolve, 500));
       setUploadStep("uploading");
 
@@ -128,12 +264,11 @@ export default function UploadPage() {
       if (!user_id) throw new Error("User not logged in");
       if (!universityId) throw new Error("University not found");
 
-      if (!file) throw new Error("No file selected"); // Should not happen due to isFormValid
-      const fileExt = file.name.split(".").pop();
+      const fileExt = compressedFile.name.split(".").pop();
       const fileName = `pdfs/${uuidv4()}.${fileExt}`;
       const { error: uploadError } = await supabase.storage
         .from("question-papers")
-        .upload(fileName, file);
+        .upload(fileName, compressedFile);
       if (uploadError) throw new Error(uploadError.message);
 
       // 5. Get public URL

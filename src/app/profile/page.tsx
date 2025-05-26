@@ -7,6 +7,8 @@ export default function ProfilePage() {
   const [tab, setTab] = useState<"personal" | "contributor">("personal");
   const [profile, setProfile] = useState<any>(null);
   const [email, setEmail] = useState("");
+  const [papersUploaded, setPapersUploaded] = useState(0);
+  const [contributorSince, setContributorSince] = useState("");
   const router = useRouter();
   const [showUniForm, setShowUniForm] = useState(false);
   const [uni, setUni] = useState({
@@ -27,12 +29,29 @@ export default function ProfilePage() {
       } = await supabase.auth.getUser();
       if (!user) return;
       setEmail(user.email || "");
-      const { data } = await supabase
+
+      // Fetch user profile
+      const { data: profileData } = await supabase
         .from("user_profiles")
-        .select("first_name, middle_name, last_name, university_name")
+        .select(
+          "first_name, middle_name, last_name, university_name, created_at"
+        )
         .eq("user_id", user.id)
         .single();
-      if (data) setProfile(data);
+      if (profileData) {
+        setProfile(profileData);
+        // Set contributor since year from created_at
+        setContributorSince(
+          new Date(profileData.created_at).getFullYear().toString()
+        );
+      }
+
+      // Fetch papers uploaded count
+      const { count } = await supabase
+        .from("question-papers")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user.id);
+      setPapersUploaded(count || 0);
     }
     fetchProfile();
   }, []);
@@ -172,11 +191,13 @@ export default function ProfilePage() {
             <h2 className="text-xl font-semibold mb-4">Contributor Page</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
               <div className="bg-white rounded-lg border border-gray-200 p-6 flex flex-col items-center">
-                <div className="text-3xl font-bold mb-1">20</div>
+                <div className="text-3xl font-bold mb-1">{papersUploaded}</div>
                 <div className="text-gray-500 text-base">Papers Uploaded</div>
               </div>
               <div className="bg-white rounded-lg border border-gray-200 p-6 flex flex-col items-center">
-                <div className="text-3xl font-bold mb-1">2022</div>
+                <div className="text-3xl font-bold mb-1">
+                  {contributorSince}
+                </div>
                 <div className="text-gray-500 text-base">Contributor Since</div>
               </div>
             </div>
