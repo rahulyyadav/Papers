@@ -78,19 +78,44 @@ export default function SignupPage() {
     }
     setError("");
     setLoading(true);
-    // Supabase signup
-    const { data, error: signUpError } = await supabase.auth.signUp({
-      email: form.email,
-      password: form.password,
-    });
-    if (signUpError) {
-      setLoading(false);
-      setError(signUpError.message);
-      return;
-    }
-    // Insert into user_profiles
-    const user_id = data.user?.id;
-    if (user_id) {
+
+    try {
+      // Supabase signup
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email: form.email,
+        password: form.password,
+        options: {
+          data: {
+            first_name: form.firstName,
+            middle_name: form.middleName,
+            last_name: form.lastName,
+            university_name: form.university,
+          },
+        },
+      });
+
+      if (signUpError) {
+        if (signUpError.message.includes("429")) {
+          setError(
+            "Too many signup attempts. Please wait a moment and try again."
+          );
+        } else {
+          setError(signUpError.message);
+        }
+        setLoading(false);
+        return;
+      }
+
+      // Get the user ID
+      const user_id = data.user?.id;
+
+      if (!user_id) {
+        setLoading(false);
+        setError("Failed to create user account.");
+        return;
+      }
+
+      // Insert into user_profiles using service role
       const { error: profileError } = await supabase
         .from("user_profiles")
         .insert([
@@ -102,15 +127,26 @@ export default function SignupPage() {
             university_name: form.university,
           },
         ]);
+
       if (profileError) {
+        console.error("Profile creation error:", profileError);
+        // If profile creation fails, we should clean up the auth user
+        await supabase.auth.admin.deleteUser(user_id);
         setLoading(false);
-        setError(profileError.message);
+        setError("Failed to create user profile. Please try again.");
         return;
       }
+
+      setLoading(false);
+      setStep(3);
+      setTimeout(() => router.push("/home"), 1500);
+    } catch (error) {
+      console.error("Signup error:", error);
+      setLoading(false);
+      setError(
+        "An unexpected error occurred during signup. Please try again later."
+      );
     }
-    setLoading(false);
-    setStep(3);
-    setTimeout(() => router.push("/home"), 1500);
   };
 
   return (

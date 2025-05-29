@@ -364,7 +364,7 @@ export default function HomePage() {
                 >
                   <div className="aspect-[1/1] bg-[#f2f4f7] flex items-center justify-center p-4">
                     <a
-                      href={paper.pdf_url}
+                      href={`/view/${paper.id}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-full h-full flex items-center justify-center hover:bg-[#e9eef3] transition-colors rounded-xl"

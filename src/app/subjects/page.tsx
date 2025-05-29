@@ -288,7 +288,7 @@ export default function SubjectsPage() {
                           {papers.map((paper) => (
                             <a
                               key={paper.id}
-                              href={paper.pdf_url}
+                              href={`/view/${paper.id}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="flex items-center gap-3 bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:border-gray-400 transition"
