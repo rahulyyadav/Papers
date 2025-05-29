@@ -3,6 +3,17 @@
 import { useEffect, useState, use } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
+interface UserProfile {
+  first_name: string;
+  last_name: string;
+}
+
+interface QuestionPaper {
+  pdf_url: string;
+  user_id: string;
+  user_profiles: UserProfile;
+}
+
 export default function PDFViewer({
   params,
 }: {
@@ -10,6 +21,7 @@ export default function PDFViewer({
 }) {
   const { id } = use(params);
   const [pdfUrl, setPdfUrl] = useState("");
+  const [uploaderName, setUploaderName] = useState("");
   const [showChatModal, setShowChatModal] = useState(false); // State for toggling chat modal
   const [rating, setRating] = useState(0); // State for star rating
   const [comment, setComment] = useState(""); // State for comment input
@@ -24,14 +36,33 @@ export default function PDFViewer({
   useEffect(() => {
     async function getPdf() {
       try {
-        const { data } = await supabase
+        const { data, error } = (await supabase
           .from("question-papers")
-          .select("pdf_url")
+          .select(
+            `
+            pdf_url,
+            user_id,
+            user_profiles (
+              first_name,
+              last_name
+            )
+          `
+          )
           .eq("id", id)
-          .single();
+          .single()) as { data: QuestionPaper | null; error: any };
+
+        if (error) {
+          console.error("Error loading PDF:", error);
+          return;
+        }
 
         if (data?.pdf_url) {
           setPdfUrl(data.pdf_url);
+        }
+
+        if (data?.user_profiles) {
+          const { first_name, last_name } = data.user_profiles;
+          setUploaderName(`${first_name} ${last_name}`);
         }
       } catch (error) {
         console.error("Error loading PDF:", error);
@@ -141,8 +172,9 @@ export default function PDFViewer({
         {/* Uploaded By Section */}
         <div className="mb-6 flex items-center justify-between">
           <h4 className="text-sm font-semibold text-gray-600">Uploaded by:</h4>
-          {/* Replace with actual uploader name */}
-          <p className="text-gray-800 text-sm">Rohan Verma</p>
+          <p className="text-gray-800 text-sm">
+            {uploaderName || "Loading..."}
+          </p>
         </div>
 
         {/* Comment Input Section */}
