@@ -167,6 +167,7 @@ export default function SubjectsPage() {
             ? `${selectedUniversity} Subjects - Papers Platform`
             : "Subjects - Papers Platform"}
         </title>
+        <meta name="google-adsense-account" content="ca-pub-2349705329371450" />
         <meta
           name="description"
           content="Browse question papers by subject for your selected university. Earn the revenue by uploading your own past exam papers."

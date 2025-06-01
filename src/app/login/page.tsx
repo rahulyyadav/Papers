@@ -41,6 +41,7 @@ export default function LoginPage() {
     <>
       <Head>
         <title>Login to Papers Platform</title>
+        <meta name="google-adsense-account" content="ca-pub-2349705329371450" />
         <meta
           name="description"
           content="Log in to your Papers Platform account to share past exam question papers, earn revenue, and access resources."

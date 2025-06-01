@@ -238,6 +238,7 @@ export default function HomePage() {
             ? `${selectedUniversity} Papers - Papers Platform`
             : "Papers Platform"}
         </title>
+        <meta name="google-adsense-account" content="ca-pub-2349705329371450" />
         <meta
           name="description"
           content="Find and access past question papers for your university. Search by course, exam, or year."

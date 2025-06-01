@@ -130,6 +130,7 @@ export default function ProfilePage() {
     <>
       <Head>
         <title>My Profile - Papers Platform</title>
+        <meta name="google-adsense-account" content="ca-pub-2349705329371450" />
         <meta
           name="description"
           content="View and update your personal and contributor information on Papers Platform."

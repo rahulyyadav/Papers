@@ -5,6 +5,7 @@ export default function RevenueModelPage() {
     <>
       <Head>
         <title>Revenue Model - Papers Platform</title>
+        <meta name="google-adsense-account" content="ca-pub-2349705329371450" />
         <meta
           name="description"
           content="Learn about the revenue sharing model for contributors on past exam Papers Platform."

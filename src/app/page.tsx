@@ -7,6 +7,7 @@ export default function Home() {
     <>
       <Head>
         <title>Papers Platform - Share, Earn, and Learn</title>
+        <meta name="google-adsense-account" content="ca-pub-2349705329371450" />
         <meta
           name="description"
           content="Share your past university exam question papers, earn revenue from views, and access academic resources."

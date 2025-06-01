@@ -344,6 +344,7 @@ export default function UploadPage() {
     <>
       <Head>
         <title>Upload Papers - Contribute and Earn</title>
+        <meta name="google-adsense-account" content="ca-pub-2349705329371450" />
         <meta
           name="description"
           content="Upload your university question papers to Papers Platform and start earning revenue."

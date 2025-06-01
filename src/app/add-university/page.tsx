@@ -155,6 +155,7 @@ export default function AddUniversityPage() {
     <>
       <Head>
         <title>Become a Contributor - Add Your University</title>
+        <meta name="google-adsense-account" content="ca-pub-2349705329371450" />
         <meta
           name="description"
           content="Become a contributor by adding your university and uploading past exam papers to earn revenue."
