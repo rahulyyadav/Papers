@@ -32,6 +32,8 @@ export default function SubjectsPage() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [expandedCourse, setExpandedCourse] = useState<string | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
 
   // Fetch user profile and universities on mount
   useEffect(() => {
@@ -200,8 +202,8 @@ export default function SubjectsPage() {
               </a>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            {/* University Dropdown */}
+          <div className="hidden md:flex items-center gap-4">
+            {/* University Dropdown - Desktop */}
             <select
               aria-label="Select university"
               className="rounded-full bg-[#f2f4f7] px-4 py-2 text-sm border border-gray-200 focus:border-gray-400 outline-none min-w-[180px]"
@@ -214,7 +216,7 @@ export default function SubjectsPage() {
                 </option>
               ))}
             </select>
-            {/* Profile Initials Dropdown */}
+            {/* Profile Initials Dropdown - Desktop */}
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setDropdownOpen((v) => !v)}
@@ -242,6 +244,73 @@ export default function SubjectsPage() {
                   </button>
                 </div>
               )}
+            </div>
+          </div>
+
+          {/* Mobile Navigation */}
+          <div className="md:hidden flex items-center gap-4">
+            {/* University Selector - Mobile */}
+            <div className="flex-1">
+              <select
+                value={selectedUniversity}
+                onChange={(e) => setSelectedUniversity(e.target.value)}
+                className="w-full text-sm bg-gray-50 border border-gray-200 rounded-full px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-black max-w-[140px]"
+                aria-label="Select university"
+              >
+                {universities.map((uni) => (
+                  <option key={uni.id} value={uni.name}>
+                    {uni.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Profile Button - Mobile */}
+            <div className="relative" ref={mobileMenuRef}>
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-sm font-medium"
+              >
+                {getInitials()}
+              </button>
+              {/* Mobile Menu Dropdown */}
+              <div
+                className={`absolute right-0 top-full mt-2 w-48 transition-all duration-300 ease-in-out z-50 ${
+                  mobileMenuOpen
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 -translate-y-2 pointer-events-none"
+                }`}
+              >
+                <div className="bg-white/80 backdrop-blur-[5px] rounded-lg shadow-lg p-2 space-y-2">
+                  <a
+                    href="/upload"
+                    className="block w-full text-center bg-black text-white rounded-full px-4 py-2 font-semibold text-xs transition hover:bg-gray-800"
+                  >
+                    Upload Paper
+                  </a>
+                  <a
+                    href="/subjects"
+                    className="block w-full text-center bg-black text-white rounded-full px-4 py-2 font-semibold text-xs transition hover:bg-gray-800"
+                  >
+                    Subjects
+                  </a>
+                  <button
+                    onClick={() => {
+                      setDropdownOpen(true);
+                      router.push("/profile");
+                    }}
+                    className="block w-full text-center bg-black text-white rounded-full px-4 py-2 font-semibold text-xs transition hover:bg-gray-800"
+                  >
+                    Profile Information
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    className="block w-full text-center bg-black text-white rounded-full px-4 py-2 font-semibold text-xs transition hover:bg-gray-800"
+                  >
+                    Logout
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </nav>

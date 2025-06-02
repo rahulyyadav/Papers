@@ -16,7 +16,9 @@ export default function HomePage() {
   const [filteredPapers, setFilteredPapers] = useState<any[]>([]); // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [searchTerm, setSearchTerm] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
   const [showChatModal, setShowChatModal] = useState(false);
   const [chatInput, setChatInput] = useState("");
   const [chatMessages, setChatMessages] = useState<
@@ -158,14 +160,20 @@ export default function HomePage() {
       ) {
         setDropdownOpen(false);
       }
+      if (
+        mobileMenuRef.current &&
+        !mobileMenuRef.current.contains(event.target as Node)
+      ) {
+        setMobileMenuOpen(false);
+      }
     }
-    if (dropdownOpen) {
+    if (dropdownOpen || mobileMenuOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     } else {
       document.removeEventListener("mousedown", handleClickOutside);
     }
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [dropdownOpen]);
+  }, [dropdownOpen, mobileMenuOpen]);
 
   const getInitials = () => {
     if (!userProfile) return "";
@@ -276,10 +284,10 @@ export default function HomePage() {
             </div>
           </div>
           <div className="flex items-center gap-4">
-            {/* University Dropdown */}
+            {/* University Dropdown - Desktop */}
             <select
               aria-label="Select university"
-              className="rounded-full bg-[#f2f4f7] px-4 py-2 text-sm border border-gray-200 focus:border-gray-400 outline-none min-w-[180px]"
+              className="hidden md:block rounded-full bg-[#f2f4f7] px-4 py-2 text-sm border border-gray-200 focus:border-gray-400 outline-none min-w-[180px]"
               value={selectedUniversity}
               onChange={(e) => setSelectedUniversity(e.target.value)}
             >
@@ -289,8 +297,8 @@ export default function HomePage() {
                 </option>
               ))}
             </select>
-            {/* Profile Initials Dropdown */}
-            <div className="relative" ref={dropdownRef}>
+            {/* Profile Initials Dropdown - Desktop */}
+            <div className="hidden md:block relative" ref={dropdownRef}>
               <button
                 onClick={() => setDropdownOpen((v) => !v)}
                 className="w-9 h-9 rounded-full bg-[#d1e0e9] flex items-center justify-center font-bold text-lg text-[#2a3a4a] border border-gray-200 hover:shadow"
@@ -317,6 +325,73 @@ export default function HomePage() {
                   </button>
                 </div>
               )}
+            </div>
+
+            {/* Mobile Navigation */}
+            <div className="md:hidden flex items-center gap-4">
+              {/* University Selector - Mobile */}
+              <div className="flex-1">
+                <select
+                  value={selectedUniversity}
+                  onChange={(e) => setSelectedUniversity(e.target.value)}
+                  className="w-full text-sm bg-gray-50 border border-gray-200 rounded-full px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-black max-w-[140px]"
+                  aria-label="Select university"
+                >
+                  {universities.map((uni) => (
+                    <option key={uni.id} value={uni.name}>
+                      {uni.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Profile Button - Mobile */}
+              <div className="relative" ref={mobileMenuRef}>
+                <button
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-sm font-medium"
+                >
+                  {getInitials()}
+                </button>
+                {/* Mobile Menu Dropdown */}
+                <div
+                  className={`absolute right-0 top-full mt-2 w-48 transition-all duration-300 ease-in-out z-50 ${
+                    mobileMenuOpen
+                      ? "opacity-100 translate-y-0"
+                      : "opacity-0 -translate-y-2 pointer-events-none"
+                  }`}
+                >
+                  <div className="bg-white/80 backdrop-blur-[5px] rounded-lg shadow-lg p-2 space-y-2">
+                    <a
+                      href="/upload"
+                      className="block w-full text-center bg-black text-white rounded-full px-4 py-2 font-semibold text-xs transition hover:bg-gray-800"
+                    >
+                      Upload Paper
+                    </a>
+                    <a
+                      href="/subjects"
+                      className="block w-full text-center bg-black text-white rounded-full px-4 py-2 font-semibold text-xs transition hover:bg-gray-800"
+                    >
+                      Subjects
+                    </a>
+                    <button
+                      onClick={() => {
+                        setDropdownOpen(true);
+                        router.push("/profile");
+                      }}
+                      className="block w-full text-center bg-black text-white rounded-full px-4 py-2 font-semibold text-xs transition hover:bg-gray-800"
+                    >
+                      Profile Information
+                    </button>
+                    <button
+                      onClick={handleLogout}
+                      className="block w-full text-center bg-black text-white rounded-full px-4 py-2 font-semibold text-xs transition hover:bg-gray-800"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </nav>

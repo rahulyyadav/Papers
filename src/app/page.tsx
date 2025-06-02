@@ -1,8 +1,11 @@
 "use client";
 
 import Head from "next/head";
+import { useState } from "react";
 
 export default function Home() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   return (
     <>
       <Head>
@@ -47,8 +50,36 @@ export default function Home() {
               Sign Up
             </a>
           </nav>
-          <nav className="block md:hidden">
-            <button className="p-2">☰</button>
+          <nav className="block md:hidden relative">
+            <button
+              className="p-2 text-xl"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              ☰
+            </button>
+            {/* Mobile Menu */}
+            <div
+              className={`absolute right-0 top-full mt-2 w-48 transition-all duration-300 ease-in-out ${
+                isMenuOpen
+                  ? "opacity-100 translate-y-0"
+                  : "opacity-0 -translate-y-2 pointer-events-none"
+              }`}
+            >
+              <div className="bg-white/80 backdrop-blur-[5px] rounded-lg shadow-lg p-2 space-y-2">
+                <a
+                  href="/login"
+                  className="block w-full text-center bg-black text-white rounded-full px-4 py-2 font-semibold text-xs transition hover:bg-gray-800"
+                >
+                  Login
+                </a>
+                <a
+                  href="/signup"
+                  className="block w-full text-center bg-black text-white rounded-full px-4 py-2 font-semibold text-xs transition hover:bg-gray-800"
+                >
+                  Sign Up
+                </a>
+              </div>
+            </div>
           </nav>
         </header>
 
