@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import Head from "next/head";
+import { useRouter } from "next/navigation";
 
 export default function ProfilePage() {
   const [tab, setTab] = useState<"personal" | "contributor">("personal");
@@ -20,6 +21,7 @@ export default function ProfilePage() {
   const [uniLoading, setUniLoading] = useState(false);
   const [uniError, setUniError] = useState("");
   const [uniSuccess, setUniSuccess] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchProfile() {
@@ -229,7 +231,13 @@ export default function ProfilePage() {
               <div className="flex flex-col items-center">
                 <button
                   className="bg-black text-white font-semibold rounded-xl py-3 px-6 transition hover:bg-gray-900 mb-6"
-                  onClick={() => setShowUniForm(true)}
+                  onClick={() => {
+                    if (!email) {
+                      router.push("/login");
+                    } else {
+                      setShowUniForm(true);
+                    }
+                  }}
                 >
                   Add new university/College
                 </button>
