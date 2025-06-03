@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import Head from "next/head";
+import { Suspense } from "react";
 
 export default function HomePage() {
   const router = useRouter();
@@ -318,109 +319,35 @@ export default function HomePage() {
           crossOrigin="anonymous"
         ></script>
       </Head>
-      <div className="min-h-screen bg-[#f7f9fb]">
-        {/* Navbar */}
-        <nav className="w-full flex items-center justify-between px-4 sm:px-8 py-3 bg-white border-b border-gray-200">
-          <div className="flex items-center gap-2 sm:gap-8">
-            <span className="font-bold text-lg sm:text-2xl tracking-tight flex items-center gap-1 sm:gap-2">
-              Papers
-            </span>
-            <div className="hidden md:flex gap-6 text-sm font-medium text-gray-700">
-              <a href="/home" className="hover:text-black">
-                Dashboard
-              </a>
-              <a href="/subjects" className="hover:text-black">
-                Subjects
-              </a>
-              <a href="/upload" className="hover:text-black">
-                Upload Paper
-              </a>
+      <Suspense fallback={<div>Loading home page...</div>}>
+        <div className="min-h-screen bg-[#f7f9fb]">
+          {/* Navbar */}
+          <nav className="w-full flex items-center justify-between px-4 sm:px-8 py-3 bg-white border-b border-gray-200">
+            <div className="flex items-center gap-2 sm:gap-8">
+              <span className="font-bold text-lg sm:text-2xl tracking-tight flex items-center gap-1 sm:gap-2">
+                Papers
+              </span>
+              <div className="hidden md:flex gap-6 text-sm font-medium text-gray-700">
+                <a href="/home" className="hover:text-black">
+                  Dashboard
+                </a>
+                <a href="/subjects" className="hover:text-black">
+                  Subjects
+                </a>
+                <a href="/upload" className="hover:text-black">
+                  Upload Paper
+                </a>
+              </div>
             </div>
-          </div>
 
-          {/* Desktop/Tablet Navigation */}
-          <div className="hidden md:flex items-center gap-4">
-            {/* University Dropdown - Desktop */}
-            <select
-              aria-label="Select university"
-              className="rounded-full bg-[#f2f4f7] px-4 py-2 text-sm border border-gray-200 focus:border-gray-400 outline-none min-w-[180px]"
-              value={selectedUniversity}
-              onChange={(e) => setSelectedUniversity(e.target.value)}
-            >
-              {universities.map((uni) => (
-                <option key={uni.id} value={uni.name}>
-                  {uni.name}
-                </option>
-              ))}
-            </select>
-            {/* Share Button - Desktop */}
-            <button
-              onClick={handleShareClick}
-              className="bg-black text-white rounded-full px-4 py-2 font-semibold text-xs transition hover:bg-gray-800"
-              disabled={!selectedUniversityId}
-            >
-              Share
-            </button>
-            {/* Profile Initials Dropdown - Desktop */}
-            <div className="relative" ref={dropdownRef}>
-              <button
-                onClick={() => setDropdownOpen((v) => !v)}
-                className="w-9 h-9 rounded-full bg-[#d1e0e9] flex items-center justify-center font-bold text-lg text-[#2a3a4a] border border-gray-200 hover:shadow"
-                title="Profile"
-              >
-                {getInitials() || "--"}
-              </button>
-              {dropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 z-50 overflow-hidden">
-                  {/* Conditionally render Login or Profile Information */}
-                  {!email && (
-                    // Show Login if not logged in
-                    <a
-                      href="/login"
-                      className="w-full block text-left px-4 py-3 hover:bg-gray-100 transition-colors duration-200"
-                      onClick={() => setDropdownOpen(false)}
-                    >
-                      Login
-                    </a>
-                  )}
-
-                  {/* Always show Profile Information if logged in */}
-                  {email && (
-                    <button
-                      className="w-full text-left px-4 py-3 hover:bg-gray-100 transition-colors duration-200"
-                      onClick={() => {
-                        setDropdownOpen(false);
-                        router.push("/profile");
-                      }}
-                    >
-                      Profile Information
-                    </button>
-                  )}
-
-                  {/* Always show Logout button */}
-                  <button
-                    className="w-full text-left px-4 py-3 hover:bg-gray-100 transition-colors duration-200 text-red-600"
-                    onClick={() => {
-                      setDropdownOpen(false);
-                      handleLogout(); // This already redirects to /
-                    }}
-                  >
-                    Logout
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Mobile Navigation */}
-          <div className="md:hidden flex items-center justify-end flex-1 gap-4">
-            {/* University Selector - Mobile */}
-            <div className="flex-1 min-w-0">
+            {/* Desktop/Tablet Navigation */}
+            <div className="hidden md:flex items-center gap-4">
+              {/* University Dropdown - Desktop */}
               <select
+                aria-label="Select university"
+                className="rounded-full bg-[#f2f4f7] px-4 py-2 text-sm border border-gray-200 focus:border-gray-400 outline-none min-w-[180px]"
                 value={selectedUniversity}
                 onChange={(e) => setSelectedUniversity(e.target.value)}
-                className="w-full text-sm bg-gray-50 border border-gray-200 rounded-full px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-black max-w-[140px]"
-                aria-label="Select university"
               >
                 {universities.map((uni) => (
                   <option key={uni.id} value={uni.name}>
@@ -428,330 +355,409 @@ export default function HomePage() {
                   </option>
                 ))}
               </select>
-            </div>
-            {/* Share Button - Mobile */}
-            <button
-              onClick={handleShareClick}
-              className="bg-black text-white rounded-full px-3 py-1.5 font-semibold text-xs transition hover:bg-gray-800"
-              disabled={!selectedUniversityId}
-            >
-              Share
-            </button>
-
-            {/* Profile Button - Mobile */}
-            <div className="relative" ref={mobileMenuRef}>
+              {/* Share Button - Desktop */}
               <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-sm font-medium"
+                onClick={handleShareClick}
+                className="bg-black text-white rounded-full px-4 py-2 font-semibold text-xs transition hover:bg-gray-800"
+                disabled={!selectedUniversityId}
               >
-                {getInitials()}
+                Share
               </button>
-              {/* Mobile Menu Dropdown */}
-              <div
-                className={`absolute right-0 top-full mt-2 w-48 transition-all duration-300 ease-in-out z-50 ${
-                  mobileMenuOpen
-                    ? "opacity-100 translate-y-0"
-                    : "opacity-0 -translate-y-2 pointer-events-none"
-                }`}
+              {/* Profile Initials Dropdown - Desktop */}
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setDropdownOpen((v) => !v)}
+                  className="w-9 h-9 rounded-full bg-[#d1e0e9] flex items-center justify-center font-bold text-lg text-[#2a3a4a] border border-gray-200 hover:shadow"
+                  title="Profile"
+                >
+                  {getInitials() || "--"}
+                </button>
+                {dropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 z-50 overflow-hidden">
+                    {/* Conditionally render Login or Profile Information */}
+                    {!email && (
+                      // Show Login if not logged in
+                      <a
+                        href="/login"
+                        className="w-full block text-left px-4 py-3 hover:bg-gray-100 transition-colors duration-200"
+                        onClick={() => setDropdownOpen(false)}
+                      >
+                        Login
+                      </a>
+                    )}
+
+                    {/* Always show Profile Information if logged in */}
+                    {email && (
+                      <button
+                        className="w-full text-left px-4 py-3 hover:bg-gray-100 transition-colors duration-200"
+                        onClick={() => {
+                          setDropdownOpen(false);
+                          router.push("/profile");
+                        }}
+                      >
+                        Profile Information
+                      </button>
+                    )}
+
+                    {/* Always show Logout button */}
+                    <button
+                      className="w-full text-left px-4 py-3 hover:bg-gray-100 transition-colors duration-200 text-red-600"
+                      onClick={() => {
+                        setDropdownOpen(false);
+                        handleLogout(); // This already redirects to /
+                      }}
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Mobile Navigation */}
+            <div className="md:hidden flex items-center justify-end flex-1 gap-4">
+              {/* University Selector - Mobile */}
+              <div className="flex-1 min-w-0">
+                <select
+                  value={selectedUniversity}
+                  onChange={(e) => setSelectedUniversity(e.target.value)}
+                  className="w-full text-sm bg-gray-50 border border-gray-200 rounded-full px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-black max-w-[140px]"
+                  aria-label="Select university"
+                >
+                  {universities.map((uni) => (
+                    <option key={uni.id} value={uni.name}>
+                      {uni.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {/* Share Button - Mobile */}
+              <button
+                onClick={handleShareClick}
+                className="bg-black text-white rounded-full px-3 py-1.5 font-semibold text-xs transition hover:bg-gray-800"
+                disabled={!selectedUniversityId}
               >
-                <div className="bg-white/80 backdrop-blur-[5px] rounded-lg shadow-lg p-2 space-y-2">
-                  {/* Conditionally render Login or Profile Information */}
-                  {!email ? (
-                    // Show Login if not logged in
+                Share
+              </button>
+
+              {/* Profile Button - Mobile */}
+              <div className="relative" ref={mobileMenuRef}>
+                <button
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-sm font-medium"
+                >
+                  {getInitials()}
+                </button>
+                {/* Mobile Menu Dropdown */}
+                <div
+                  className={`absolute right-0 top-full mt-2 w-48 transition-all duration-300 ease-in-out z-50 ${
+                    mobileMenuOpen
+                      ? "opacity-100 translate-y-0"
+                      : "opacity-0 -translate-y-2 pointer-events-none"
+                  }`}
+                >
+                  <div className="bg-white/80 backdrop-blur-[5px] rounded-lg shadow-lg p-2 space-y-2">
+                    {/* Conditionally render Login or Profile Information */}
+                    {!email ? (
+                      // Show Login if not logged in
+                      <a
+                        href="/login"
+                        className="block w-full text-center bg-black text-white rounded-full px-4 py-2 font-semibold text-xs transition hover:bg-gray-800"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        Login
+                      </a>
+                    ) : (
+                      // Show Profile Information if logged in
+                      <button
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          router.push("/profile");
+                        }}
+                        className="block w-full text-center bg-black text-white rounded-full px-4 py-2 font-semibold text-xs transition hover:bg-gray-800"
+                      >
+                        Profile Information
+                      </button>
+                    )}
+
+                    {/* Conditionally show Upload Paper and always show Subjects in mobile menu */}
+                    {email && (
+                      <a
+                        href="/upload"
+                        className="block w-full text-center bg-black text-white rounded-full px-4 py-2 font-semibold text-xs transition hover:bg-gray-800"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        Upload Paper
+                      </a>
+                    )}
+
                     <a
-                      href="/login"
+                      href="/subjects"
                       className="block w-full text-center bg-black text-white rounded-full px-4 py-2 font-semibold text-xs transition hover:bg-gray-800"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Login
+                      Subjects
                     </a>
-                  ) : (
-                    // Show Profile Information if logged in
+
+                    {/* Always show Logout button in mobile menu */}
                     <button
                       onClick={() => {
                         setMobileMenuOpen(false);
-                        router.push("/profile");
+                        handleLogout();
                       }}
-                      className="block w-full text-center bg-black text-white rounded-full px-4 py-2 font-semibold text-xs transition hover:bg-gray-800"
+                      className="block w-full text-center bg-black text-white rounded-full px-4 py-2 font-semibold text-xs transition hover:bg-gray-800 text-red-600"
                     >
-                      Profile Information
+                      Logout
                     </button>
-                  )}
-
-                  {/* Conditionally show Upload Paper and always show Subjects in mobile menu */}
-                  {email && (
-                    <a
-                      href="/upload"
-                      className="block w-full text-center bg-black text-white rounded-full px-4 py-2 font-semibold text-xs transition hover:bg-gray-800"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      Upload Paper
-                    </a>
-                  )}
-
-                  <a
-                    href="/subjects"
-                    className="block w-full text-center bg-black text-white rounded-full px-4 py-2 font-semibold text-xs transition hover:bg-gray-800"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Subjects
-                  </a>
-
-                  {/* Always show Logout button in mobile menu */}
-                  <button
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      handleLogout();
-                    }}
-                    className="block w-full text-center bg-black text-white rounded-full px-4 py-2 font-semibold text-xs transition hover:bg-gray-800 text-red-600"
-                  >
-                    Logout
-                  </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </nav>
+          </nav>
 
-        {/* Main Content */}
-        <div className="flex flex-col lg:flex-row gap-8 px-8 py-8 max-w-7xl mx-auto">
-          {/* Left: Recent Papers */}
-          <div className="flex-1 min-w-0">
-            <h2 className="text-2xl font-bold mb-6">
-              {selectedUniversity} Papers
-            </h2>
-            <div className="mb-8">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search by course name, code, exam name, or year"
-                  className="w-full rounded-xl bg-[#e9eef3] px-4 py-3 pl-10 text-base border border-gray-200 focus:border-gray-400 outline-none"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-                <span className="absolute left-3 top-3 text-gray-400">
-                  <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
-                    <path
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1 0 6.5 6.5a7.5 7.5 0 0 0 10.6 10.6Z"
-                    />
-                  </svg>
-                </span>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-              {currentPapers.length === 0 && (
-                <div className="col-span-full text-gray-500 text-center py-8">
-                  {searchTerm
-                    ? "No papers found matching your search."
-                    : "No papers found for this university."}
+          {/* Main Content */}
+          <div className="flex flex-col lg:flex-row gap-8 px-8 py-8 max-w-7xl mx-auto">
+            {/* Left: Recent Papers */}
+            <div className="flex-1 min-w-0">
+              <h2 className="text-2xl font-bold mb-6">
+                {selectedUniversity} Papers
+              </h2>
+              <div className="mb-8">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search by course name, code, exam name, or year"
+                    className="w-full rounded-xl bg-[#e9eef3] px-4 py-3 pl-10 text-base border border-gray-200 focus:border-gray-400 outline-none"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                  <span className="absolute left-3 top-3 text-gray-400">
+                    <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
+                      <path
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1 0 6.5 6.5a7.5 7.5 0 0 0 10.6 10.6Z"
+                      />
+                    </svg>
+                  </span>
                 </div>
-              )}
-              {currentPapers.map((paper) => (
-                <div
-                  key={paper.id}
-                  className="bg-white rounded-2xl overflow-hidden shadow-sm flex flex-col border border-gray-200 hover:border-gray-400 transition"
-                >
-                  <div className="aspect-[1/1] bg-[#f2f4f7] flex items-center justify-center p-4">
-                    <a
-                      href={`/view/${paper.id}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full h-full flex items-center justify-center hover:bg-[#e9eef3] transition-colors rounded-xl"
-                    >
-                      <div className="flex flex-col items-center gap-2">
-                        <svg
-                          width="48"
-                          height="48"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            clipRule="evenodd"
-                            d="M8.707 4.293a1 1 0 0 1 0 1.414L5.414 9H17a1 1 0 1 1 0 2H5.414l3.293 3.293a1 1 0 0 1-1.414 1.414l-5-5a1 1 0 0 1 0-1.414l5-5a1 1 0 0 1 1.414 0Z"
-                            fill="#6B7280"
-                          />
-                        </svg>
-                        <span className="text-sm text-gray-600">View PDF</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                {currentPapers.length === 0 && (
+                  <div className="col-span-full text-gray-500 text-center py-8">
+                    {searchTerm
+                      ? "No papers found matching your search."
+                      : "No papers found for this university."}
+                  </div>
+                )}
+                {currentPapers.map((paper) => (
+                  <div
+                    key={paper.id}
+                    className="bg-white rounded-2xl overflow-hidden shadow-sm flex flex-col border border-gray-200 hover:border-gray-400 transition"
+                  >
+                    <div className="aspect-[1/1] bg-[#f2f4f7] flex items-center justify-center p-4">
+                      <a
+                        href={`/view/${paper.id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full h-full flex items-center justify-center hover:bg-[#e9eef3] transition-colors rounded-xl"
+                      >
+                        <div className="flex flex-col items-center gap-2">
+                          <svg
+                            width="48"
+                            height="48"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              clipRule="evenodd"
+                              d="M8.707 4.293a1 1 0 0 1 0 1.414L5.414 9H17a1 1 0 1 1 0 2H5.414l3.293 3.293a1 1 0 0 1-1.414 1.414l-5-5a1 1 0 0 1 0-1.414l5-5a1 1 0 0 1 1.414 0Z"
+                              fill="#6B7280"
+                            />
+                          </svg>
+                          <span className="text-sm text-gray-600">
+                            View PDF
+                          </span>
+                        </div>
+                      </a>
+                    </div>
+                    <div className="p-4 flex flex-col gap-2">
+                      <div className="font-semibold text-base">
+                        {paper.course_name}
                       </div>
-                    </a>
-                  </div>
-                  <div className="p-4 flex flex-col gap-2">
-                    <div className="font-semibold text-base">
-                      {paper.course_name}
-                    </div>
-                    <div className="flex flex-wrap gap-2 text-xs">
-                      <span className="bg-[#d1e0e9] text-[#2a3a4a] rounded-full px-3 py-1">
-                        {paper.course_code}
-                      </span>
-                      <span className="bg-[#c6d9b7] text-[#3a4a2a] rounded-full px-3 py-1">
-                        {paper.exam_name}
-                      </span>
-                      <span className="bg-[#e9c6b7] text-[#4a3a2a] rounded-full px-3 py-1">
-                        {paper.exam_year}
-                      </span>
-                    </div>
-                    <div className="text-gray-400 text-xs">
-                      Uploaded{" "}
-                      {new Date(paper.uploaded_at).toLocaleDateString()}
+                      <div className="flex flex-wrap gap-2 text-xs">
+                        <span className="bg-[#d1e0e9] text-[#2a3a4a] rounded-full px-3 py-1">
+                          {paper.course_code}
+                        </span>
+                        <span className="bg-[#c6d9b7] text-[#3a4a2a] rounded-full px-3 py-1">
+                          {paper.exam_name}
+                        </span>
+                        <span className="bg-[#e9c6b7] text-[#4a3a2a] rounded-full px-3 py-1">
+                          {paper.exam_year}
+                        </span>
+                      </div>
+                      <div className="text-gray-400 text-xs">
+                        Uploaded{" "}
+                        {new Date(paper.uploaded_at).toLocaleDateString()}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-            {/* Pagination */}
-            {filteredPapers.length > papersPerPage && (
-              <div className="flex justify-center gap-4 mt-8">
-                <button
-                  onClick={handlePrevPage}
-                  disabled={currentPage === 1}
-                  className="bg-black text-white font-semibold rounded-xl py-2 px-6 transition disabled:opacity-60"
-                >
-                  Previous Page
-                </button>
-                <button
-                  onClick={handleNextPage}
-                  disabled={currentPage === totalPages}
-                  className="bg-black text-white font-semibold rounded-xl py-2 px-6 transition disabled:opacity-60"
-                >
-                  Next Page
-                </button>
-              </div>
-            )}
-          </div>
-          {/* Right: Ask AI */}
-          <aside className="w-full lg:w-[320px] flex-shrink-0">
-            <div className="bg-white rounded-2xl shadow p-6 mb-6">
-              <h3 className="font-semibold text-lg mb-4">Ask AI</h3>
-              <div className="flex flex-col gap-3 text-sm text-gray-700 mb-4">
-                <div className="font-medium">Suggested Prompts:</div>
-                {suggestedPrompts.map((prompt, index) => (
-                  <button
-                    key={index}
-                    className="text-left bg-[#e9eef3] hover:bg-[#dbe3ea] transition rounded-lg px-3 py-2 cursor-pointer"
-                    onClick={() => handleSuggestedPromptClick(prompt)}
-                  >
-                    {prompt}
-                  </button>
                 ))}
               </div>
-              <button
-                className="w-full bg-[#e9eef3] text-black font-semibold rounded-xl py-2 mt-2 hover:bg-[#dbe3ea] transition"
-                onClick={() => setShowChatModal(true)}
-              >
-                Ask AI
-              </button>
+              {/* Pagination */}
+              {filteredPapers.length > papersPerPage && (
+                <div className="flex justify-center gap-4 mt-8">
+                  <button
+                    onClick={handlePrevPage}
+                    disabled={currentPage === 1}
+                    className="bg-black text-white font-semibold rounded-xl py-2 px-6 transition disabled:opacity-60"
+                  >
+                    Previous Page
+                  </button>
+                  <button
+                    onClick={handleNextPage}
+                    disabled={currentPage === totalPages}
+                    className="bg-black text-white font-semibold rounded-xl py-2 px-6 transition disabled:opacity-60"
+                  >
+                    Next Page
+                  </button>
+                </div>
+              )}
             </div>
-          </aside>
-        </div>
-        {/* Chat Modal */}
-        {showChatModal && (
-          <>
-            <div
-              className="fixed inset-0 bg-black/40 z-40"
-              onClick={() => setShowChatModal(false)}
-            />
-            <div className="fixed inset-0 z-50 flex items-center justify-center">
-              <div className="bg-white rounded-2xl border border-gray-200 p-6 w-full max-w-md shadow-xl relative flex flex-col h-[80vh]">
+            {/* Right: Ask AI */}
+            <aside className="w-full lg:w-[320px] flex-shrink-0">
+              <div className="bg-white rounded-2xl shadow p-6 mb-6">
+                <h3 className="font-semibold text-lg mb-4">Ask AI</h3>
+                <div className="flex flex-col gap-3 text-sm text-gray-700 mb-4">
+                  <div className="font-medium">Suggested Prompts:</div>
+                  {suggestedPrompts.map((prompt, index) => (
+                    <button
+                      key={index}
+                      className="text-left bg-[#e9eef3] hover:bg-[#dbe3ea] transition rounded-lg px-3 py-2 cursor-pointer"
+                      onClick={() => handleSuggestedPromptClick(prompt)}
+                    >
+                      {prompt}
+                    </button>
+                  ))}
+                </div>
                 <button
-                  className="absolute top-4 right-4 text-2xl text-gray-400 hover:text-black"
-                  onClick={() => setShowChatModal(false)}
+                  className="w-full bg-[#e9eef3] text-black font-semibold rounded-xl py-2 mt-2 hover:bg-[#dbe3ea] transition"
+                  onClick={() => setShowChatModal(true)}
+                >
+                  Ask AI
+                </button>
+              </div>
+            </aside>
+          </div>
+
+          {/* Chat Modal */}
+          {showChatModal && (
+            <>
+              <div
+                className="fixed inset-0 bg-black/40 z-40"
+                onClick={() => setShowChatModal(false)}
+              />
+              <div className="fixed inset-0 z-50 flex items-center justify-center">
+                <div className="bg-white rounded-2xl border border-gray-200 p-6 w-full max-w-md shadow-xl relative flex flex-col h-[80vh]">
+                  <button
+                    className="absolute top-4 right-4 text-2xl text-gray-400 hover:text-black"
+                    onClick={() => setShowChatModal(false)}
+                    aria-label="Close"
+                  >
+                    &times;
+                  </button>
+                  <h4 className="text-lg font-semibold mb-2">Ask AI</h4>
+                  <div className="flex-1 overflow-y-auto mb-4 border rounded-lg p-2 bg-[#f7f9fb]">
+                    {chatMessages.length === 0 && (
+                      <div className="text-gray-400 text-center py-8">
+                        Ask anything about papers, exams, or universities!
+                      </div>
+                    )}
+                    {chatMessages.map((msg, i) => (
+                      <div
+                        key={i}
+                        className={`mb-2 flex ${
+                          msg.role === "user" ? "justify-end" : "justify-start"
+                        }`}
+                      >
+                        <div
+                          className={`px-4 py-2 rounded-xl max-w-[80%] text-sm ${
+                            msg.role === "user"
+                              ? "bg-black text-white"
+                              : "bg-[#e9eef3] text-black"
+                          }`}
+                        >
+                          {msg.text}
+                        </div>
+                      </div>
+                    ))}
+                    {chatLoading && (
+                      <div className="flex justify-start mb-2">
+                        <div className="px-4 py-2 rounded-xl bg-[#e9eef3] text-black text-sm animate-pulse">
+                          Thinking...
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <form
+                    className="flex gap-2"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      handleAskAI();
+                    }}
+                    autoComplete="off"
+                  >
+                    <input
+                      type="text"
+                      className="flex-1 rounded-lg border border-gray-200 px-4 py-2 bg-white text-base focus:border-black outline-none"
+                      placeholder="Type your question..."
+                      value={chatInput}
+                      onChange={(e) => setChatInput(e.target.value)}
+                      disabled={chatLoading}
+                    />
+                    <button
+                      type="submit"
+                      className="bg-black text-white font-semibold rounded-lg px-4 py-2 disabled:opacity-60"
+                      disabled={chatLoading || !chatInput.trim()}
+                    >
+                      Send
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Share Modal */}
+          {showShareModal && shareUrl && (
+            <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 px-4">
+              <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-sm flex flex-col items-center relative">
+                <button
+                  onClick={() => setShowShareModal(false)}
+                  className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-xl"
                   aria-label="Close"
                 >
                   &times;
                 </button>
-                <h4 className="text-lg font-semibold mb-2">Ask AI</h4>
-                <div className="flex-1 overflow-y-auto mb-4 border rounded-lg p-2 bg-[#f7f9fb]">
-                  {chatMessages.length === 0 && (
-                    <div className="text-gray-400 text-center py-8">
-                      Ask anything about papers, exams, or universities!
-                    </div>
-                  )}
-                  {chatMessages.map((msg, i) => (
-                    <div
-                      key={i}
-                      className={`mb-2 flex ${
-                        msg.role === "user" ? "justify-end" : "justify-start"
-                      }`}
-                    >
-                      <div
-                        className={`px-4 py-2 rounded-xl max-w-[80%] text-sm ${
-                          msg.role === "user"
-                            ? "bg-black text-white"
-                            : "bg-[#e9eef3] text-black"
-                        }`}
-                      >
-                        {msg.text}
-                      </div>
-                    </div>
-                  ))}
-                  {chatLoading && (
-                    <div className="flex justify-start mb-2">
-                      <div className="px-4 py-2 rounded-xl bg-[#e9eef3] text-black text-sm animate-pulse">
-                        Thinking...
-                      </div>
-                    </div>
-                  )}
+                <h3 className="text-lg font-semibold mb-4">Share Link</h3>
+                <div className="w-full bg-gray-100 p-3 rounded-lg mb-4 break-all text-center text-sm border border-gray-300 text-black">
+                  {shareUrl}
                 </div>
-                <form
-                  className="flex gap-2"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    handleAskAI();
-                  }}
-                  autoComplete="off"
+                <button
+                  onClick={handleCopyLink}
+                  className="bg-black text-white px-6 py-2 rounded-full font-semibold text-base transition hover:bg-gray-800"
                 >
-                  <input
-                    type="text"
-                    className="flex-1 rounded-lg border border-gray-200 px-4 py-2 bg-white text-base focus:border-black outline-none"
-                    placeholder="Type your question..."
-                    value={chatInput}
-                    onChange={(e) => setChatInput(e.target.value)}
-                    disabled={chatLoading}
-                  />
-                  <button
-                    type="submit"
-                    className="bg-black text-white font-semibold rounded-lg px-4 py-2 disabled:opacity-60"
-                    disabled={chatLoading || !chatInput.trim()}
-                  >
-                    Send
-                  </button>
-                </form>
+                  {copied ? "Link Copied!" : "Copy Link"}
+                </button>
               </div>
             </div>
-          </>
-        )}
-
-        {/* Share Modal */}
-        {showShareModal && shareUrl && (
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 px-4">
-            <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-sm flex flex-col items-center relative">
-              <button
-                onClick={() => setShowShareModal(false)}
-                className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-xl"
-                aria-label="Close"
-              >
-                &times;
-              </button>
-              <h3 className="text-lg font-semibold mb-4">Share Link</h3>
-              <div className="w-full bg-gray-100 p-3 rounded-lg mb-4 break-all text-center text-sm border border-gray-300 text-black">
-                {shareUrl}
-              </div>
-              <button
-                onClick={handleCopyLink}
-                className="bg-black text-white px-6 py-2 rounded-full font-semibold text-base transition hover:bg-gray-800"
-              >
-                {copied ? "Link Copied!" : "Copy Link"}
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      </Suspense>
     </>
   );
 }
