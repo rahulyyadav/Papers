@@ -31,6 +31,7 @@ export default function HomePage() {
   const [chatLoading, setChatLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const papersPerPage = 6;
+  const [email, setEmail] = useState("");
 
   // Suggested prompts
   const suggestedPrompts = [
@@ -86,6 +87,7 @@ export default function HomePage() {
         if (data) {
           setUserProfile(data); // eslint-disable-next-line @typescript-eslint/no-explicit-any
           userUni = data.university_name;
+          setEmail(user.user_metadata.email);
         }
       }
       // Fetch universities
@@ -369,19 +371,39 @@ export default function HomePage() {
                 {getInitials() || "--"}
               </button>
               {dropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 z-50">
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 z-50 overflow-hidden">
+                  {/* Conditionally render Login or Profile Information */}
+                  {!email && (
+                    // Show Login if not logged in
+                    <a
+                      href="/login"
+                      className="w-full block text-left px-4 py-3 hover:bg-gray-100 transition-colors duration-200"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      Login
+                    </a>
+                  )}
+
+                  {/* Always show Profile Information if logged in */}
+                  {email && (
+                    <button
+                      className="w-full text-left px-4 py-3 hover:bg-gray-100 transition-colors duration-200"
+                      onClick={() => {
+                        setDropdownOpen(false);
+                        router.push("/profile");
+                      }}
+                    >
+                      Profile Information
+                    </button>
+                  )}
+
+                  {/* Always show Logout button */}
                   <button
-                    className="w-full text-left px-4 py-3 hover:bg-gray-100 rounded-t-lg"
+                    className="w-full text-left px-4 py-3 hover:bg-gray-100 transition-colors duration-200 text-red-600"
                     onClick={() => {
                       setDropdownOpen(false);
-                      router.push("/profile");
+                      handleLogout(); // This already redirects to /
                     }}
-                  >
-                    Profile Information
-                  </button>
-                  <button
-                    className="w-full text-left px-4 py-3 hover:bg-gray-100 rounded-b-lg text-red-600"
-                    onClick={handleLogout}
                   >
                     Logout
                   </button>
@@ -433,30 +455,55 @@ export default function HomePage() {
                 }`}
               >
                 <div className="bg-white/80 backdrop-blur-[5px] rounded-lg shadow-lg p-2 space-y-2">
-                  <a
-                    href="/upload"
-                    className="block w-full text-center bg-black text-white rounded-full px-4 py-2 font-semibold text-xs transition hover:bg-gray-800"
-                  >
-                    Upload Paper
-                  </a>
+                  {/* Conditionally render Login or Profile Information */}
+                  {!email ? (
+                    // Show Login if not logged in
+                    <a
+                      href="/login"
+                      className="block w-full text-center bg-black text-white rounded-full px-4 py-2 font-semibold text-xs transition hover:bg-gray-800"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Login
+                    </a>
+                  ) : (
+                    // Show Profile Information if logged in
+                    <button
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        router.push("/profile");
+                      }}
+                      className="block w-full text-center bg-black text-white rounded-full px-4 py-2 font-semibold text-xs transition hover:bg-gray-800"
+                    >
+                      Profile Information
+                    </button>
+                  )}
+
+                  {/* Conditionally show Upload Paper and always show Subjects in mobile menu */}
+                  {email && (
+                    <a
+                      href="/upload"
+                      className="block w-full text-center bg-black text-white rounded-full px-4 py-2 font-semibold text-xs transition hover:bg-gray-800"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Upload Paper
+                    </a>
+                  )}
+
                   <a
                     href="/subjects"
                     className="block w-full text-center bg-black text-white rounded-full px-4 py-2 font-semibold text-xs transition hover:bg-gray-800"
+                    onClick={() => setMobileMenuOpen(false)}
                   >
                     Subjects
                   </a>
+
+                  {/* Always show Logout button in mobile menu */}
                   <button
                     onClick={() => {
-                      setDropdownOpen(true);
-                      router.push("/profile");
+                      setMobileMenuOpen(false);
+                      handleLogout();
                     }}
-                    className="block w-full text-center bg-black text-white rounded-full px-4 py-2 font-semibold text-xs transition hover:bg-gray-800"
-                  >
-                    Profile Information
-                  </button>
-                  <button
-                    onClick={handleLogout}
-                    className="block w-full text-center bg-black text-white rounded-full px-4 py-2 font-semibold text-xs transition hover:bg-gray-800"
+                    className="block w-full text-center bg-black text-white rounded-full px-4 py-2 font-semibold text-xs transition hover:bg-gray-800 text-red-600"
                   >
                     Logout
                   </button>
