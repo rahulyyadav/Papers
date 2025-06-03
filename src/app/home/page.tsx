@@ -1,11 +1,12 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import Head from "next/head";
 
 export default function HomePage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [userProfile, setUserProfile] = useState<any>(null); // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [universities, setUniversities] = useState<any[]>([]); // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [selectedUniversity, setSelectedUniversity] = useState<string>("");
@@ -20,6 +21,9 @@ export default function HomePage() {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const [showChatModal, setShowChatModal] = useState(false);
+  const [shareUrl, setShareUrl] = useState("");
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [chatInput, setChatInput] = useState("");
   const [chatMessages, setChatMessages] = useState<
     { role: "user" | "ai"; text: string }[]
@@ -90,18 +94,29 @@ export default function HomePage() {
         .select("id, name");
       if (uniData) {
         setUniversities(uniData); // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        // Set default selected university to user's university
-        const defaultUni = uniData.find((u: any) => u.name === userUni); // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        setSelectedUniversity(
-          defaultUni ? defaultUni.name : uniData[0]?.name || ""
-        );
-        setSelectedUniversityId(
-          defaultUni ? defaultUni.id : uniData[0]?.id || null
-        );
+
+        const universityIdFromUrl = searchParams.get("universityId");
+        let initialUni = null;
+
+        if (universityIdFromUrl) {
+          initialUni = uniData.find((u: any) => u.id === universityIdFromUrl); // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        }
+
+        // If no university ID in URL or not found, try user's university, else default to first
+        if (!initialUni) {
+          initialUni = uniData.find((u: any) => u.name === userUni); // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        }
+
+        if (!initialUni && uniData.length > 0) {
+          initialUni = uniData[0];
+        }
+
+        setSelectedUniversity(initialUni?.name || "");
+        setSelectedUniversityId(initialUni?.id || null);
       }
     }
     fetchData();
-  }, []);
+  }, [searchParams, supabase, router]); // Add searchParams, supabase, router to dependency array
 
   // Update selectedUniversityId when selectedUniversity changes
   useEffect(() => {
@@ -238,6 +253,50 @@ export default function HomePage() {
     setChatLoading(false);
   };
 
+  const generateShareUrl = () => {
+    if (!selectedUniversityId) return "";
+    const origin = window.location.origin;
+    return `${origin}/home?universityId=${selectedUniversityId}`;
+  };
+
+  const handleShareClick = () => {
+    const url = generateShareUrl();
+    if (url) {
+      setShareUrl(url);
+      setShowShareModal(true);
+    }
+  };
+
+  const handleCopyLink = async () => {
+    if (navigator.clipboard && navigator.clipboard.writeText && shareUrl) {
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000); // Reset button text after 2 seconds
+      } catch (err) {
+        console.error("Failed to copy: ", err);
+        alert("Failed to copy the link.");
+      }
+    } else {
+      // Fallback for browsers that don't support the Clipboard API
+      const textarea = document.createElement("textarea");
+      textarea.value = shareUrl;
+      textarea.style.position = "fixed"; // Prevent scrolling to bottom of page in Microsoft Edge.
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      try {
+        document.execCommand("copy");
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000); // Reset button text after 2 seconds
+      } catch (err) {
+        console.error("Oops, unable to copy", err);
+        alert("Failed to copy the link.");
+      }
+      document.body.removeChild(textarea);
+    }
+  };
+
   return (
     <>
       <Head>
@@ -259,20 +318,13 @@ export default function HomePage() {
       </Head>
       <div className="min-h-screen bg-[#f7f9fb]">
         {/* Navbar */}
-        <nav className="w-full flex items-center justify-between px-8 py-4 bg-white border-b border-gray-200">
-          <div className="flex items-center gap-8">
-            <span className="font-bold text-2xl tracking-tight flex items-center gap-2">
+        <nav className="w-full flex items-center justify-between px-4 sm:px-8 py-3 bg-white border-b border-gray-200">
+          <div className="flex items-center gap-2 sm:gap-8">
+            <span className="font-bold text-lg sm:text-2xl tracking-tight flex items-center gap-1 sm:gap-2">
               Papers
             </span>
             <div className="hidden md:flex gap-6 text-sm font-medium text-gray-700">
-              <a
-                href="/home"
-                onClick={(e) => {
-                  e.preventDefault();
-                  router.refresh();
-                }}
-                className="hover:text-black font-semibold text-black"
-              >
+              <a href="/home" className="hover:text-black">
                 Dashboard
               </a>
               <a href="/subjects" className="hover:text-black">
@@ -283,11 +335,13 @@ export default function HomePage() {
               </a>
             </div>
           </div>
-          <div className="flex items-center gap-4">
+
+          {/* Desktop/Tablet Navigation */}
+          <div className="hidden md:flex items-center gap-4">
             {/* University Dropdown - Desktop */}
             <select
               aria-label="Select university"
-              className="hidden md:block rounded-full bg-[#f2f4f7] px-4 py-2 text-sm border border-gray-200 focus:border-gray-400 outline-none min-w-[180px]"
+              className="rounded-full bg-[#f2f4f7] px-4 py-2 text-sm border border-gray-200 focus:border-gray-400 outline-none min-w-[180px]"
               value={selectedUniversity}
               onChange={(e) => setSelectedUniversity(e.target.value)}
             >
@@ -297,8 +351,16 @@ export default function HomePage() {
                 </option>
               ))}
             </select>
+            {/* Share Button - Desktop */}
+            <button
+              onClick={handleShareClick}
+              className="bg-black text-white rounded-full px-4 py-2 font-semibold text-xs transition hover:bg-gray-800"
+              disabled={!selectedUniversityId}
+            >
+              Share
+            </button>
             {/* Profile Initials Dropdown - Desktop */}
-            <div className="hidden md:block relative" ref={dropdownRef}>
+            <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setDropdownOpen((v) => !v)}
                 className="w-9 h-9 rounded-full bg-[#d1e0e9] flex items-center justify-center font-bold text-lg text-[#2a3a4a] border border-gray-200 hover:shadow"
@@ -326,70 +388,78 @@ export default function HomePage() {
                 </div>
               )}
             </div>
+          </div>
 
-            {/* Mobile Navigation */}
-            <div className="md:hidden flex items-center gap-4">
-              {/* University Selector - Mobile */}
-              <div className="flex-1">
-                <select
-                  value={selectedUniversity}
-                  onChange={(e) => setSelectedUniversity(e.target.value)}
-                  className="w-full text-sm bg-gray-50 border border-gray-200 rounded-full px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-black max-w-[140px]"
-                  aria-label="Select university"
-                >
-                  {universities.map((uni) => (
-                    <option key={uni.id} value={uni.name}>
-                      {uni.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+          {/* Mobile Navigation */}
+          <div className="md:hidden flex items-center justify-end flex-1 gap-4">
+            {/* University Selector - Mobile */}
+            <div className="flex-1 min-w-0">
+              <select
+                value={selectedUniversity}
+                onChange={(e) => setSelectedUniversity(e.target.value)}
+                className="w-full text-sm bg-gray-50 border border-gray-200 rounded-full px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-black max-w-[140px]"
+                aria-label="Select university"
+              >
+                {universities.map((uni) => (
+                  <option key={uni.id} value={uni.name}>
+                    {uni.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {/* Share Button - Mobile */}
+            <button
+              onClick={handleShareClick}
+              className="bg-black text-white rounded-full px-3 py-1.5 font-semibold text-xs transition hover:bg-gray-800"
+              disabled={!selectedUniversityId}
+            >
+              Share
+            </button>
 
-              {/* Profile Button - Mobile */}
-              <div className="relative" ref={mobileMenuRef}>
-                <button
-                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-sm font-medium"
-                >
-                  {getInitials()}
-                </button>
-                {/* Mobile Menu Dropdown */}
-                <div
-                  className={`absolute right-0 top-full mt-2 w-48 transition-all duration-300 ease-in-out z-50 ${
-                    mobileMenuOpen
-                      ? "opacity-100 translate-y-0"
-                      : "opacity-0 -translate-y-2 pointer-events-none"
-                  }`}
-                >
-                  <div className="bg-white/80 backdrop-blur-[5px] rounded-lg shadow-lg p-2 space-y-2">
-                    <a
-                      href="/upload"
-                      className="block w-full text-center bg-black text-white rounded-full px-4 py-2 font-semibold text-xs transition hover:bg-gray-800"
-                    >
-                      Upload Paper
-                    </a>
-                    <a
-                      href="/subjects"
-                      className="block w-full text-center bg-black text-white rounded-full px-4 py-2 font-semibold text-xs transition hover:bg-gray-800"
-                    >
-                      Subjects
-                    </a>
-                    <button
-                      onClick={() => {
-                        setDropdownOpen(true);
-                        router.push("/profile");
-                      }}
-                      className="block w-full text-center bg-black text-white rounded-full px-4 py-2 font-semibold text-xs transition hover:bg-gray-800"
-                    >
-                      Profile Information
-                    </button>
-                    <button
-                      onClick={handleLogout}
-                      className="block w-full text-center bg-black text-white rounded-full px-4 py-2 font-semibold text-xs transition hover:bg-gray-800"
-                    >
-                      Logout
-                    </button>
-                  </div>
+            {/* Profile Button - Mobile */}
+            <div className="relative" ref={mobileMenuRef}>
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-sm font-medium"
+              >
+                {getInitials()}
+              </button>
+              {/* Mobile Menu Dropdown */}
+              <div
+                className={`absolute right-0 top-full mt-2 w-48 transition-all duration-300 ease-in-out z-50 ${
+                  mobileMenuOpen
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 -translate-y-2 pointer-events-none"
+                }`}
+              >
+                <div className="bg-white/80 backdrop-blur-[5px] rounded-lg shadow-lg p-2 space-y-2">
+                  <a
+                    href="/upload"
+                    className="block w-full text-center bg-black text-white rounded-full px-4 py-2 font-semibold text-xs transition hover:bg-gray-800"
+                  >
+                    Upload Paper
+                  </a>
+                  <a
+                    href="/subjects"
+                    className="block w-full text-center bg-black text-white rounded-full px-4 py-2 font-semibold text-xs transition hover:bg-gray-800"
+                  >
+                    Subjects
+                  </a>
+                  <button
+                    onClick={() => {
+                      setDropdownOpen(true);
+                      router.push("/profile");
+                    }}
+                    className="block w-full text-center bg-black text-white rounded-full px-4 py-2 font-semibold text-xs transition hover:bg-gray-800"
+                  >
+                    Profile Information
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    className="block w-full text-center bg-black text-white rounded-full px-4 py-2 font-semibold text-xs transition hover:bg-gray-800"
+                  >
+                    Logout
+                  </button>
                 </div>
               </div>
             </div>
@@ -608,6 +678,31 @@ export default function HomePage() {
               </div>
             </div>
           </>
+        )}
+
+        {/* Share Modal */}
+        {showShareModal && shareUrl && (
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 px-4">
+            <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-sm flex flex-col items-center relative">
+              <button
+                onClick={() => setShowShareModal(false)}
+                className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-xl"
+                aria-label="Close"
+              >
+                &times;
+              </button>
+              <h3 className="text-lg font-semibold mb-4">Share Link</h3>
+              <div className="w-full bg-gray-100 p-3 rounded-lg mb-4 break-all text-center text-sm border border-gray-300 text-black">
+                {shareUrl}
+              </div>
+              <button
+                onClick={handleCopyLink}
+                className="bg-black text-white px-6 py-2 rounded-full font-semibold text-base transition hover:bg-gray-800"
+              >
+                {copied ? "Link Copied!" : "Copy Link"}
+              </button>
+            </div>
+          </div>
         )}
       </div>
     </>
