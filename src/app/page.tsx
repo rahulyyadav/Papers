@@ -136,14 +136,13 @@ export default function Home() {
               Join. Upload. Get Rewarded.
             </h2>
             <p className="mb-4 text-center text-gray-700 max-w-md">
-              Sign up now to start sharing and accessing university exam
-              questions and answers.
+              Experience the platform before you decide to join.
             </p>
             <a
-              href="/signup"
+              href="/home"
               className="bg-black text-white rounded-full px-6 py-3 font-semibold text-base hover:bg-gray-900 transition cursor-pointer"
             >
-              Sign up free
+              Browse Without Login
             </a>
           </section>
         </main>
