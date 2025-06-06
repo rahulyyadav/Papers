@@ -36,6 +36,12 @@ export default function PDFViewer({
   useEffect(() => {
     async function getPdf() {
       try {
+        // Check authentication status
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        console.log("Viewing user authenticated:", !!user);
+
         const { data, error } = (await supabase
           .from("question-papers")
           .select(
@@ -51,6 +57,8 @@ export default function PDFViewer({
           .eq("id", id)
           .single()) as { data: QuestionPaper | null; error: any };
 
+        console.log("Supabase fetch result:", { data, error }); // Log the result
+
         if (error) {
           console.error("Error loading PDF:", error);
           return;
@@ -61,8 +69,11 @@ export default function PDFViewer({
         }
 
         if (data?.user_profiles) {
+          console.log("User profile data fetched:", data.user_profiles); // Log profile data
           const { first_name, last_name } = data.user_profiles;
           setUploaderName(`${first_name} ${last_name}`);
+        } else {
+          console.log("No user profile data found for this paper."); // Log if no profile data
         }
       } catch (error) {
         console.error("Error loading PDF:", error);
@@ -129,16 +140,16 @@ export default function PDFViewer({
   return (
     <div className="flex flex-col md:flex-row h-screen relative">
       {/* PDF Viewer Section */}
-      <div className="flex-1 h-3/5 md:h-full overflow-hidden bg-gray-100">
+      <div className="flex-1 h-4/5 md:h-full overflow-hidden bg-gray-100 w-full">
         <iframe
           src={pdfUrl}
-          className="w-full h-full border-0"
+          className="w-full h-full border-0 p-0 m-0 block"
           title="PDF Viewer"
         />
       </div>
 
       {/* Mobile Bottom Section */}
-      <div className="md:hidden flex flex-col flex-1 bg-white p-6 overflow-y-auto">
+      <div className="md:hidden flex flex-col h-1/5 bg-white p-6 overflow-y-auto">
         {/* Ask AI Button - Mobile */}
         <div className="mb-4">
           <button
@@ -200,7 +211,7 @@ export default function PDFViewer({
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 transform rotate-90"
+              className="h-5 w-5"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"

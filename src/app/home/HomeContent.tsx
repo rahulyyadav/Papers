@@ -449,7 +449,7 @@ export default function HomeContent() {
           {/* Mobile Navigation */}
           <div className="md:hidden flex items-center justify-end flex-1 gap-4">
             {/* University Selector - Mobile */}
-            <div className="flex-1 min-w-0">
+            <div className="min-w-0">
               <select
                 value={selectedUniversity}
                 onChange={(e) => setSelectedUniversity(e.target.value)}
@@ -476,7 +476,7 @@ export default function HomeContent() {
             <div className="relative" ref={mobileMenuRef}>
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-sm font-medium"
+                className="w-8 h-8 rounded-full bg-[#FAF1E6] flex items-center justify-center text-sm font-medium text-white"
               >
                 {getInitials()}
               </button>
