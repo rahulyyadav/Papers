@@ -13,13 +13,34 @@ export default function AuthCallback() {
       console.log("Auth callback started");
       
       try {
-        // Small delay to ensure page is fully loaded
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Handle the auth callback from URL hash/params
-        const { data, error } = await supabase.auth.getSession();
+        // Handle OAuth callback with URL hash parameters
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const accessToken = hashParams.get('access_token');
         
         console.log("Current URL:", window.location.href);
+        console.log("Access token found:", !!accessToken);
+        
+        if (accessToken) {
+          // Set the session from the URL parameters
+          const { data, error } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: hashParams.get('refresh_token') || ''
+          });
+          
+          console.log("Session set result:", data);
+          console.log("Session set error:", error);
+          
+          if (error) {
+            console.error("Session set error:", error);
+            setError("Failed to authenticate: " + error.message);
+            setTimeout(() => router.push("/login"), 3000);
+            return;
+          }
+        }
+        
+        // Get current session
+        const { data, error } = await supabase.auth.getSession();
+        
         console.log("Session data:", data);
         console.log("Session error:", error);
         
