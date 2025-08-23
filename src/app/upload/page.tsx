@@ -266,10 +266,19 @@ export default function UploadPage() {
       setUploadStep("success");
       setSuccess(true);
       
-      // Show success message for 1 second, then reset success state but keep form
+      // Show success message for 1 second, then clear form
       setTimeout(() => {
         setSuccess(false);
         setLoading(false);
+        // Clear form fields after success message
+        setUniversity("");
+        setExam("");
+        setCustomExam("");
+        setExamYear("");
+        setCourseCode("");
+        setCourseName("");
+        setSelectedAdditionalRule("");
+        setFile(null);
       }, 1000);
     } catch (err: any) {
       setError(err.message || "Upload failed");
