@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import Head from "next/head"; // Although Head is typically in layout.tsx, keeping it here for now as it was in the original component
+import ReactMarkdown from "react-markdown";
 
 interface UserProfile {
   first_name?: string;
@@ -268,13 +269,12 @@ export default function HomeContent() {
 
       const res = await fetch("/api/ask-gemini", {
         method: "POST",
-        body: JSON.stringify({ prompt: fullPrompt }), // Send the combined prompt and context
+        body: JSON.stringify({ question: userMessage }), // Send only the user's question
         headers: { "Content-Type": "application/json" },
       });
       const data = await res.json();
       setChatMessages((msgs) => [...msgs, { role: "ai", text: data.text }]);
     } catch (e) {
-      console.error("Error fetching AI response:", e);
       setChatMessages((msgs) => [
         ...msgs,
         {
@@ -711,80 +711,184 @@ export default function HomeContent() {
 
         {/* Chat Modal */}
         {showChatModal && (
-          <>
-            <div
-              className="fixed inset-0 bg-black/40 z-40"
-              onClick={() => setShowChatModal(false)}
-            />
-            <div className="fixed inset-0 z-50 flex items-center justify-center">
-              <div className="bg-white rounded-2xl border border-gray-200 p-6 w-full max-w-md shadow-xl relative flex flex-col h-[80vh]">
-                <button
-                  className="absolute top-4 right-4 text-2xl text-gray-400 hover:text-black"
-                  onClick={() => setShowChatModal(false)}
-                  aria-label="Close"
+          <div className="fixed top-0 right-0 z-50 w-full max-w-md h-full bg-white shadow-2xl border-l border-gray-200 flex flex-col">
+            {/* Header with close button */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white">
+              <h4 className="text-lg font-semibold text-gray-800">Ask AI</h4>
+              <button
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                onClick={() => setShowChatModal(false)}
+                aria-label="Close"
+              >
+                <svg
+                  className="w-5 h-5 text-gray-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
-                  &times;
-                </button>
-                <h4 className="text-lg font-semibold mb-2">Ask AI</h4>
-                <div className="flex-1 overflow-y-auto mb-4 border rounded-lg p-2 bg-[#f7f9fb]">
-                  {chatMessages.length === 0 && (
-                    <div className="text-gray-400 text-center py-8">
-                      Ask anything about papers, exams, or universities!
-                    </div>
-                  )}
-                  {chatMessages.map((msg, i) => (
-                    <div
-                      key={i}
-                      className={`mb-2 flex ${
-                        msg.role === "user" ? "justify-end" : "justify-start"
-                      }`}
-                    >
-                      <div
-                        className={`px-4 py-2 rounded-xl max-w-[80%] text-sm ${
-                          msg.role === "user"
-                            ? "bg-black text-white"
-                            : "bg-[#e9eef3] text-black"
-                        }`}
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            {/* Chat messages */}
+            <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
+              {chatMessages.length === 0 && (
+                <div className="text-gray-400 text-center py-8">
+                  Ask anything about papers, exams, or universities!
+                </div>
+              )}
+              {chatMessages.map((msg, i) => (
+                <div
+                  key={i}
+                  className={`mb-3 flex ${
+                    msg.role === "user" ? "justify-end" : "justify-start"
+                  }`}
+                >
+                  <div
+                    className={`px-4 py-3 rounded-2xl max-w-[85%] text-sm shadow-sm ${
+                      msg.role === "user"
+                        ? "bg-blue-600 text-white"
+                        : "bg-white text-gray-800 border border-gray-200"
+                    }`}
+                  >
+                    {msg.role === "user" ? (
+                      msg.text
+                    ) : (
+                                             <ReactMarkdown
+                         components={{
+                          // Custom styling for different markdown elements
+                          h1: ({ children }) => (
+                            <h1 className="text-lg font-bold mb-2 text-gray-900">
+                              {children}
+                            </h1>
+                          ),
+                          h2: ({ children }) => (
+                            <h2 className="text-base font-bold mb-2 text-gray-900">
+                              {children}
+                            </h2>
+                          ),
+                          h3: ({ children }) => (
+                            <h3 className="text-sm font-bold mb-1 text-gray-900">
+                              {children}
+                            </h3>
+                          ),
+                          p: ({ children }) => (
+                            <p className="mb-2 text-gray-800">{children}</p>
+                          ),
+                          strong: ({ children }) => (
+                            <strong className="font-bold text-gray-900">
+                              {children}
+                            </strong>
+                          ),
+                          em: ({ children }) => (
+                            <em className="italic text-gray-800">{children}</em>
+                          ),
+                          ul: ({ children }) => (
+                            <ul className="list-disc list-inside mb-2 space-y-1">
+                              {children}
+                            </ul>
+                          ),
+                          ol: ({ children }) => (
+                            <ol className="list-decimal list-inside mb-2 space-y-1">
+                              {children}
+                            </ol>
+                          ),
+                          li: ({ children }) => (
+                            <li className="text-gray-800">{children}</li>
+                          ),
+                          code: ({ children, className }) => {
+                            const isInline = !className;
+                            return isInline ? (
+                              <code className="bg-gray-100 px-1 py-0.5 rounded text-sm font-mono text-gray-800">
+                                {children}
+                              </code>
+                            ) : (
+                              <code className="block bg-gray-100 p-2 rounded text-sm font-mono text-gray-800 overflow-x-auto">
+                                {children}
+                              </code>
+                            );
+                          },
+                          pre: ({ children }) => (
+                            <pre className="bg-gray-100 p-2 rounded text-sm font-mono text-gray-800 overflow-x-auto mb-2">
+                              {children}
+                            </pre>
+                          ),
+                          blockquote: ({ children }) => (
+                            <blockquote className="border-l-4 border-gray-300 pl-4 italic text-gray-700 mb-2">
+                              {children}
+                            </blockquote>
+                          ),
+                          a: ({ children, href }) => (
+                            <a
+                              href={href}
+                              className="text-blue-600 hover:text-blue-800 underline"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              {children}
+                            </a>
+                          ),
+                        }}
                       >
                         {msg.text}
-                      </div>
-                    </div>
-                  ))}
-                  {chatLoading && (
-                    <div className="flex justify-start mb-2">
-                      <div className="px-4 py-2 rounded-xl bg-[#e9eef3] text-black text-sm animate-pulse">
-                        Thinking...
-                      </div>
-                    </div>
-                  )}
+                      </ReactMarkdown>
+                    )}
+                  </div>
                 </div>
-                <form
-                  className="flex gap-2"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    handleAskAI();
-                  }}
-                  autoComplete="off"
-                >
-                  <input
-                    type="text"
-                    className="flex-1 rounded-lg border border-gray-200 px-4 py-2 bg-white text-base focus:border-black outline-none"
-                    placeholder="Type your question..."
-                    value={chatInput}
-                    onChange={(e) => setChatInput(e.target.value)}
-                    disabled={chatLoading}
-                  />
-                  <button
-                    type="submit"
-                    className="bg-black text-white font-semibold rounded-lg px-4 py-2 disabled:opacity-60"
-                    disabled={chatLoading || !chatInput.trim()}
-                  >
-                    Send
-                  </button>
-                </form>
-              </div>
+              ))}
+              {chatLoading && (
+                <div className="flex justify-start mb-3">
+                  <div className="px-4 py-3 rounded-2xl bg-white text-gray-800 text-sm border border-gray-200 shadow-sm">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                      <div
+                        className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                        style={{ animationDelay: "0.1s" }}
+                      ></div>
+                      <div
+                        className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                        style={{ animationDelay: "0.2s" }}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
-          </>
+
+            {/* Input form */}
+            <div className="p-4 border-t border-gray-200 bg-white">
+              <form
+                className="flex gap-3"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleAskAI();
+                }}
+                autoComplete="off"
+              >
+                <input
+                  type="text"
+                  className="flex-1 rounded-xl border border-gray-200 px-4 py-3 bg-white text-base focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all"
+                  placeholder="Type your question..."
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  disabled={chatLoading}
+                />
+                <button
+                  type="submit"
+                  className="bg-blue-600 text-white font-semibold rounded-xl px-6 py-3 disabled:opacity-60 hover:bg-blue-700 transition-colors"
+                  disabled={chatLoading || !chatInput.trim()}
+                >
+                  Send
+                </button>
+              </form>
+            </div>
+          </div>
         )}
       </div>
     </>

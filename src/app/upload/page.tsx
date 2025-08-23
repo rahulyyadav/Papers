@@ -93,7 +93,6 @@ export default function UploadPage() {
     file.type === "application/pdf";
 
   async function compressPdfToUnderHalfMB(inputPdf: File): Promise<Blob> {
-    console.log("Original PDF size:", (inputPdf.size / 1024).toFixed(2), "KB");
     const buffer = await inputPdf.arrayBuffer();
 
     // Load the PDF
@@ -111,29 +110,16 @@ export default function UploadPage() {
 
     // Get all pages
     const pages = pdfDoc.getPages();
-    console.log("Number of pages:", pages.length);
 
     // First pass: Aggressive page scaling
     for (let i = 0; i < pages.length; i++) {
       const page = pages[i];
       const { width, height } = page.getSize();
-      console.log(
-        `Page ${i + 1} original size:`,
-        width.toFixed(0),
-        "x",
-        height.toFixed(0)
-      );
 
       // More aggressive scaling - target 800px max dimension
       const scale = Math.min(800 / width, 800 / height);
       page.scale(scale, scale);
       const newSize = page.getSize();
-      console.log(
-        `Page ${i + 1} new size:`,
-        newSize.width.toFixed(0),
-        "x",
-        newSize.height.toFixed(0)
-      );
     }
 
     // First compression pass
@@ -144,15 +130,8 @@ export default function UploadPage() {
       updateFieldAppearances: false,
     });
 
-    console.log(
-      "First compression size:",
-      (compressedPdfBytes.byteLength / 1024).toFixed(2),
-      "KB"
-    );
-
     // If still too large, try second pass with even more aggressive compression
     if (compressedPdfBytes.byteLength > 500 * 1024) {
-      console.log("Applying second compression pass...");
       const pdfDoc2 = await PDFDocument.load(compressedPdfBytes);
       const pages = pdfDoc2.getPages();
 
@@ -164,12 +143,6 @@ export default function UploadPage() {
         const scale = Math.min(600 / width, 600 / height);
         page.scale(scale, scale);
         const newSize = page.getSize();
-        console.log(
-          `Page ${i + 1} final size:`,
-          newSize.width.toFixed(0),
-          "x",
-          newSize.height.toFixed(0)
-        );
       }
 
       // Final save with maximum compression
@@ -180,15 +153,8 @@ export default function UploadPage() {
         updateFieldAppearances: false,
       });
 
-      console.log(
-        "Final compression size:",
-        (finalBytes.byteLength / 1024).toFixed(2),
-        "KB"
-      );
-
       // If still too large, try one final pass
       if (finalBytes.byteLength > 500 * 1024) {
-        console.log("Applying final compression pass...");
         const pdfDoc3 = await PDFDocument.load(finalBytes);
         const pages = pdfDoc3.getPages();
 
@@ -208,11 +174,7 @@ export default function UploadPage() {
           updateFieldAppearances: false,
         });
 
-        console.log(
-          "Ultra compression size:",
-          (ultraCompressedBytes.byteLength / 1024).toFixed(2),
-          "KB"
-        );
+
         return new Blob([ultraCompressedBytes], { type: "application/pdf" });
       }
 
