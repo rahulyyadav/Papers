@@ -29,11 +29,11 @@ export default function LoginPage() {
 
   const handleGoogleLogin = async () => {
     setLoading(true);
-    console.log("Starting Google login with redirect to:", `${window.location.origin}/auth/callback`);
+    // console.log("Starting Google login with redirect to:", `${window.location.origin}/auth/callback`);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `https://uni-papers.com/auth/callback`,
       },
     });
     setLoading(false);

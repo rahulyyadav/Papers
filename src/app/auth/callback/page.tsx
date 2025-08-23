@@ -10,12 +10,18 @@ export default function AuthCallback() {
 
   useEffect(() => {
     const handleAuthCallback = async () => {
+      console.log("Auth callback started");
+      
       try {
-        // Handle the auth callback from URL hash
+        // Small delay to ensure page is fully loaded
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Handle the auth callback from URL hash/params
         const { data, error } = await supabase.auth.getSession();
         
-        console.log("Auth callback - session data:", data);
-        console.log("Auth callback - error:", error);
+        console.log("Current URL:", window.location.href);
+        console.log("Session data:", data);
+        console.log("Session error:", error);
         
         if (error) {
           console.error("Auth error:", error);
@@ -25,7 +31,7 @@ export default function AuthCallback() {
         }
 
         if (data.session?.user) {
-          console.log("User found:", data.session.user);
+          console.log("User found, checking profile");
           
           // Check if user profile already exists
           const { data: profile, error: profileError } = await supabase
@@ -53,7 +59,7 @@ export default function AuthCallback() {
           }
         } else {
           console.log("No user session found");
-          setError("No user session found");
+          setError("No user session found - please try logging in again");
           setTimeout(() => router.push("/login"), 3000);
         }
       } catch (err) {
@@ -68,28 +74,35 @@ export default function AuthCallback() {
     handleAuthCallback();
   }, [router]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Setting up your account...</p>
-        </div>
-      </div>
-    );
-  }
-
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 to-pink-100">
-        <div className="text-center">
-          <div className="text-red-600 text-xl mb-4">⚠️</div>
-          <p className="text-red-600 mb-2">{error}</p>
-          <p className="text-gray-600">Redirecting to login...</p>
+        <div className="text-center bg-white/80 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-white/20 max-w-md mx-4">
+          <div className="text-red-600 text-4xl mb-4">⚠️</div>
+          <h2 className="text-xl font-bold text-gray-800 mb-2">Authentication Error</h2>
+          <p className="text-red-600 mb-4">{error}</p>
+          <p className="text-gray-600 mb-4">Redirecting to login...</p>
+          <button 
+            onClick={() => router.push("/login")}
+            className="bg-red-600 text-white px-6 py-2 rounded-xl hover:bg-red-700 transition-colors"
+          >
+            Go to Login
+          </button>
         </div>
       </div>
     );
   }
 
-  return null;
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="text-center bg-white/80 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-white/20 max-w-md mx-4">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <h2 className="text-xl font-bold text-gray-800 mb-2">Setting up your account</h2>
+        <p className="text-gray-600">Please wait while we process your login...</p>
+        <div className="mt-4 text-sm text-gray-500">
+          This may take a few seconds
+        </div>
+      </div>
+    </div>
+  );
 }

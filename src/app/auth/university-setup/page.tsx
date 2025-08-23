@@ -19,11 +19,11 @@ export default function UniversitySetup() {
     const getUser = async () => {
       const { data: { user }, error } = await supabase.auth.getUser();
       
-      console.log("University setup - user data:", user);
-      console.log("University setup - error:", error);
+      // console.log("University setup - user data:", user);
+      // console.log("University setup - error:", error);
       
       if (error || !user) {
-        console.log("No user found, redirecting to login");
+        // console.log("No user found, redirecting to login");
         router.push("/login");
         return;
       }
@@ -35,8 +35,8 @@ export default function UniversitySetup() {
       const firstName = user.user_metadata?.given_name || "";
       const lastName = user.user_metadata?.family_name || "";
       
-      console.log("User metadata:", user.user_metadata);
-      console.log("Full name:", fullName, "First:", firstName, "Last:", lastName);
+      // console.log("User metadata:", user.user_metadata);
+      // console.log("Full name:", fullName, "First:", firstName, "Last:", lastName);
       
       if (firstName && lastName) {
         setFirstName(firstName);
@@ -58,8 +58,8 @@ export default function UniversitySetup() {
         .select("name")
         .order("name");
 
-      console.log("Universities data:", universitiesData);
-      console.log("Universities error:", universitiesError);
+      // console.log("Universities data:", universitiesData);
+      // console.log("Universities error:", universitiesError);
 
       if (universitiesError) {
         console.error("Error fetching universities:", universitiesError);
@@ -99,7 +99,7 @@ export default function UniversitySetup() {
 
       if (insertError) {
         console.error("Error creating profile:", insertError);
-        setError("Failed to create profile. Please try again.");
+        setError(`Failed to create profile: ${insertError.message}`);
         return;
       }
 
