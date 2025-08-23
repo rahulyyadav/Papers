@@ -17,8 +17,8 @@ export default function AuthCallback() {
         const hashParams = new URLSearchParams(window.location.hash.substring(1));
         const accessToken = hashParams.get('access_token');
         
-        console.log("Current URL:", window.location.href);
-        console.log("Access token found:", !!accessToken);
+        // console.log("Current URL:", window.location.href);
+        // console.log("Access token found:", !!accessToken);
         
         if (accessToken) {
           // Set the session from the URL parameters
