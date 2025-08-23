@@ -27,6 +27,7 @@ interface QuestionPaper {
   exam_year: number;
   pdf_url: string;
   uploaded_at: string;
+  additional?: string;
 }
 
 export default function HomeContent() {
@@ -169,7 +170,7 @@ export default function HomeContent() {
       const { data, error } = await supabase
         .from("question-papers")
         .select(
-          "id, course_code, course_name, exam_name, exam_year, pdf_url, uploaded_at"
+          "id, course_code, course_name, exam_name, exam_year, pdf_url, uploaded_at, additional"
         )
         .eq("university_id", selectedUniversityId)
         .order("uploaded_at", { ascending: false });
@@ -641,8 +642,13 @@ export default function HomeContent() {
                     </a>
                   </div>
                   <div className="p-4 flex flex-col gap-2">
-                    <div className="font-semibold text-base">
-                      {paper.course_name}
+                    <div className="font-semibold text-base flex items-center justify-between">
+                      <span>{paper.course_name}</span>
+                      {paper.additional && (
+                        <span className="bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 text-xs font-medium px-2 py-1 rounded-full border border-purple-200">
+                          {paper.additional}
+                        </span>
+                      )}
                     </div>
                     <div className="flex flex-wrap gap-2 text-xs">
                       <span className="bg-[#d1e0e9] text-[#2a3a4a] rounded-full px-3 py-1">

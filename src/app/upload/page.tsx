@@ -10,6 +10,8 @@ export default function UploadPage() {
   const [university, setUniversity] = useState("");
   const [universityId, setUniversityId] = useState<string | null>(null);
   const [examNames, setExamNames] = useState<string[]>([]);
+  const [additionalRules, setAdditionalRules] = useState<string[]>([]);
+  const [selectedAdditionalRule, setSelectedAdditionalRule] = useState<string>("");
   const [exam, setExam] = useState("");
   const [customExam, setCustomExam] = useState("");
   const [examYear, setExamYear] = useState("");
@@ -36,7 +38,7 @@ export default function UploadPage() {
     async function fetchUniversities() {
       const { data, error } = await supabase
         .from("universities")
-        .select("id, name, exam_names");
+        .select("id, name, exam_names, additional");
       if (!error && data) setUniversities(data);
     }
     fetchUniversities();
@@ -53,9 +55,11 @@ export default function UploadPage() {
     const uni = universities.find((u) => u.name === university);
     if (uni) {
       setExamNames(uni.exam_names || []);
+      setAdditionalRules(uni.additional || []);
       setUniversityId(uni.id);
       setExam("");
       setCustomExam("");
+      setSelectedAdditionalRule("");
     }
   }, [university, universities]);
 
@@ -90,7 +94,8 @@ export default function UploadPage() {
     courseCode &&
     courseName &&
     file &&
-    file.type === "application/pdf";
+    file.type === "application/pdf" &&
+    (additionalRules.length === 0 || selectedAdditionalRule);
 
   async function compressPdfToUnderHalfMB(inputPdf: File): Promise<Blob> {
     const buffer = await inputPdf.arrayBuffer();
@@ -174,7 +179,6 @@ export default function UploadPage() {
           updateFieldAppearances: false,
         });
 
-
         return new Blob([ultraCompressedBytes], { type: "application/pdf" });
       }
 
@@ -253,6 +257,7 @@ export default function UploadPage() {
             exam_name: exam === "Other" ? customExam : exam,
             exam_year: parseInt(examYear, 10),
             pdf_url,
+            additional: selectedAdditionalRule || null,
             uploaded_at: new Date().toISOString(),
           },
         ]);
@@ -267,6 +272,7 @@ export default function UploadPage() {
       setExamYear("");
       setCourseCode("");
       setCourseName("");
+      setSelectedAdditionalRule("");
       setFile(null);
     } catch (err: any) {
       setError(err.message || "Upload failed");
@@ -473,6 +479,42 @@ export default function UploadPage() {
                 aria-label="Course Name"
               />
             </div>
+
+            {/* Additional Exam Rules Selection */}
+            {additionalRules.length > 0 && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  Exam Slot/Pattern
+                  <span className="block text-xs text-gray-500 font-normal mt-1">
+                    Select the exam slot or pattern for this paper
+                  </span>
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {additionalRules.map((rule, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => setSelectedAdditionalRule(rule)}
+                      disabled={loading}
+                      className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 transform hover:scale-105 border-2 ${
+                        selectedAdditionalRule === rule
+                          ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg border-blue-600'
+                          : `border-transparent ${
+                            index % 6 === 0 ? 'bg-gradient-to-r from-red-100 to-pink-200 hover:from-red-200 hover:to-pink-300 text-red-700' :
+                            index % 6 === 1 ? 'bg-gradient-to-r from-blue-100 to-indigo-200 hover:from-blue-200 hover:to-indigo-300 text-blue-700' :
+                            index % 6 === 2 ? 'bg-gradient-to-r from-green-100 to-emerald-200 hover:from-green-200 hover:to-emerald-300 text-green-700' :
+                            index % 6 === 3 ? 'bg-gradient-to-r from-yellow-100 to-orange-200 hover:from-yellow-200 hover:to-orange-300 text-yellow-700' :
+                            index % 6 === 4 ? 'bg-gradient-to-r from-purple-100 to-violet-200 hover:from-purple-200 hover:to-violet-300 text-purple-700' :
+                            'bg-gradient-to-r from-teal-100 to-cyan-200 hover:from-teal-200 hover:to-cyan-300 text-teal-700'
+                          }`
+                      }`}
+                    >
+                      {rule}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* File Upload */}
             <div>
